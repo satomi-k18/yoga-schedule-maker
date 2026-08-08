@@ -1,0 +1,1339 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- GitHub Pages はHTTPヘッダーを設定できないため、CSPはここで指定する -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex">
+<title>ヨガスケジュールメーカー</title>
+<style>
+  :root{
+    --bg:#faf8f5; --card:#fff; --ink:#2e2a26; --sub:#7a726a;
+    --line:#e6e0d8; --accent:#7b8f6b; --accent-ink:#fff;
+    --sun:#c0554d; --sat:#4d6fa8; --radius:14px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
+    line-height:1.7; font-size:15px;
+  }
+  .wrap{max-width:1100px; margin:0 auto; padding:24px 16px 80px}
+  header h1{font-size:22px; margin:0 0 4px}
+  header p{margin:0 0 24px; color:var(--sub); font-size:13px}
+  .panel{
+    background:var(--card); border:1px solid var(--line);
+    border-radius:var(--radius); padding:18px; margin-bottom:18px;
+  }
+  .panel h2{font-size:15px; margin:0 0 14px; display:flex; align-items:center; gap:8px}
+  .panel h2 .num{
+    background:var(--accent); color:var(--accent-ink); width:22px; height:22px;
+    border-radius:50%; display:grid; place-items:center; font-size:12px; flex:none;
+  }
+  label{display:block; font-size:12px; color:var(--sub); margin-bottom:4px}
+  input,select,button{font-family:inherit; font-size:14px}
+  input,select{
+    width:100%; padding:8px 10px; border:1px solid var(--line);
+    border-radius:8px; background:#fff; color:var(--ink);
+  }
+  .grid{display:grid; gap:12px}
+  .g-setting{grid-template-columns:2fr 1fr 1fr}
+  .g-form{grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); align-items:end}
+  button{
+    padding:9px 16px; border:0; border-radius:8px; background:var(--accent);
+    color:var(--accent-ink); cursor:pointer; white-space:nowrap;
+  }
+  button:hover{opacity:.88}
+  button.ghost{background:transparent; color:var(--sub); border:1px solid var(--line)}
+  button.mini{padding:4px 10px; font-size:12px}
+  .row{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+
+  /* 登録一覧 */
+  .sub-h{font-size:12px; color:var(--sub); margin:14px 0 6px; font-weight:600}
+  .sub-h:first-child{margin-top:0}
+  .list{display:flex; flex-direction:column; gap:6px}
+  .item{
+    display:flex; align-items:center; gap:10px; padding:8px 10px;
+    border:1px solid var(--line); border-radius:8px; font-size:13px;
+  }
+  .swatch{width:14px; height:14px; border-radius:4px; flex:none}
+  .item .when{color:var(--sub); font-variant-numeric:tabular-nums; white-space:nowrap}
+  .item .nm{font-weight:600}
+  .item .tc{color:var(--sub); margin-left:auto}
+  .empty{color:var(--sub); font-size:13px; padding:8px 0}
+
+  /* 月間ビュー（時間帯そろえ） */
+  .wk{margin-bottom:20px; break-inside:avoid}
+  .wk-label{font-size:12px; color:var(--sub); margin-bottom:6px; font-weight:600}
+  .cal{width:100%; border-collapse:collapse; table-layout:fixed}
+  .cal th,.cal td{border:1px solid var(--line); padding:4px; font-size:11px}
+  .cal thead th{background:#f2ede6; font-weight:600; font-size:12px; padding:6px 2px}
+  .cal .tcol{
+    width:62px; background:#f7f3ee; color:var(--sub); text-align:center;
+    vertical-align:middle; font-variant-numeric:tabular-nums; font-weight:600;
+  }
+  .cal td{vertical-align:top; height:52px}
+  .cal .sun{color:var(--sun)} .cal .sat{color:var(--sat)}
+  .cal .out{background:#faf8f5}
+  .cal .drow td{
+    background:#f7f3ee; font-weight:700; font-size:12px; text-align:center;
+    padding:3px; border-top:2px solid #d8d0c6;
+  }
+  .cal .drow td.out{background:#faf8f5}
+  .cal .none{color:#b8b0a6; text-align:center}
+  .grid-cal td{height:auto; min-height:88px; vertical-align:top}
+  .grid-cal .dnum{font-weight:700; font-size:12px; margin-bottom:3px}
+  .grid-cal .sun .dnum{color:var(--sun)}
+  .grid-cal .sat .dnum{color:var(--sat)}
+  .grid-cal .moon{font-weight:500; font-size:10px; color:var(--sub); margin-left:4px}
+  .grid-cal .rest{color:#b8b0a6; font-size:11px; padding:6px 0 0 2px}
+  .grid-cal.aligned .chip{height:58px; overflow:hidden; margin-bottom:3px}
+  .grid-cal.aligned .spacer{height:58px; margin-bottom:3px}
+  .chip{border-radius:4px; padding:3px 5px; margin-bottom:2px; line-height:1.35}
+  .chip b{display:block; font-weight:600}
+  .chip span{display:block; font-size:10px; opacity:.85}
+  .chip .t{font-weight:700; opacity:1; font-variant-numeric:tabular-nums; letter-spacing:-.02em}
+
+  canvas{max-width:100%; height:auto; border:1px solid var(--line); border-radius:8px}
+  .hint{font-size:12px; color:var(--sub); margin:8px 0 0}
+
+  @media (max-width:820px){
+    .g-setting{grid-template-columns:1fr 1fr}
+    .cal{font-size:10px}
+    .cal .tcol{width:48px}
+  }
+  @media print{
+    .panel:not(#printArea), header{display:none}
+    #printArea{border:0; padding:0}
+    .row{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>ヨガスケジュールメーカー</h1>
+  <p>日付ごとにクラスを入れると、月間表とInstagram用画像が出ます。データはこの端末に保存されます。</p>
+</header>
+
+<!-- 1 -->
+<section class="panel">
+  <h2><span class="num">1</span>基本設定</h2>
+  <div class="grid g-setting">
+    <div>
+      <label>タイトル（スタジオ名・教室名）</label>
+      <input id="title" placeholder="WELLNESS.LABO ヨガクラス">
+    </div>
+    <div><label>年</label><select id="year"></select></div>
+    <div><label>月</label><select id="month"></select></div>
+  </div>
+</section>
+
+<!-- 2 -->
+<section class="panel">
+  <h2><span class="num">2</span>クラスを登録</h2>
+  <div class="grid g-form">
+    <div><label>日付</label><input type="date" id="f-date"></div>
+    <div>
+      <label>くり返し</label>
+      <select id="f-repeat">
+        <option value="0">この日だけ</option>
+        <option value="1">毎週この曜日</option>
+      </select>
+    </div>
+    <div><label>開始</label><select id="f-start"></select></div>
+    <div><label>終了</label><select id="f-end"></select></div>
+    <div><label>クラスを選ぶ</label><select id="f-preset"></select></div>
+    <div><label>クラス名（直接入力もOK）</label><input id="f-name" list="nameList" placeholder="マイソール"><datalist id="nameList"></datalist></div>
+    <div><label>講師を選ぶ</label><select id="f-tpreset"></select></div>
+    <div><label>講師名（直接入力もOK）</label><input id="f-teacher" list="teacherList" placeholder="Satomi"><datalist id="teacherList"></datalist></div>
+    <div><label>色</label><select id="f-color"></select></div>
+    <div><button id="add">追加</button></div>
+  </div>
+
+  <div class="row" style="margin-top:10px">
+    <button class="ghost mini" id="toggleName">クラス名・講師名を登録する</button>
+    <button class="ghost mini" id="toggleColor">色を自分で追加する</button>
+  </div>
+
+  <div id="nameBox" style="display:none; margin-top:10px; padding:12px; border:1px solid var(--line); border-radius:10px">
+    <div class="row" style="align-items:flex-end">
+      <div style="flex:1; min-width:180px">
+        <label>クラス名</label><input id="n-name" placeholder="ハタヨガ">
+      </div>
+      <button id="n-add">登録する</button>
+      <button class="ghost mini" id="n-sample">例を入れる</button>
+    </div>
+    <p class="hint">自分のスタジオのクラス名を登録すると、上の「クラスを選ぶ」から選べるようになります。<br>スケジュールに使った名前は、登録していなくても自動で候補に入ります。</p>
+    <div id="nameManageList" class="list" style="margin-top:10px"></div>
+
+    <div style="border-top:1px solid var(--line); margin-top:16px; padding-top:14px">
+      <div class="row" style="align-items:flex-end">
+        <div style="flex:1; min-width:180px">
+          <label>講師名</label><input id="t-name" placeholder="Satomi">
+        </div>
+        <button id="t-add">登録する</button>
+      </div>
+      <p class="hint">スタジオの講師を登録しておくと、上の「講師を選ぶ」から選べます。<br>一覧から削除しても、登録済みのスケジュールはそのまま残ります。</p>
+      <div id="teacherManageList" class="list" style="margin-top:10px"></div>
+    </div>
+  </div>
+  <div id="colorBox" style="display:none; margin-top:10px; padding:12px; border:1px solid var(--line); border-radius:10px">
+    <div class="row" style="align-items:flex-end">
+      <div style="flex:1; min-width:150px">
+        <label>色の名前</label><input id="c-name" placeholder="スタジオカラー">
+      </div>
+      <div style="width:110px">
+        <label>背景色</label><input type="color" id="c-bg" value="#cfe3d8" style="height:38px; padding:3px">
+      </div>
+      <button id="c-add">この色を追加</button>
+    </div>
+    <p class="hint">文字色は背景の明るさから自動で決まります。</p>
+    <div id="customList" class="list" style="margin-top:10px"></div>
+  </div>
+  <p class="hint">毎週ある固定クラスは「毎週この曜日」、週によって違うクラスは「この日だけ」で入れてください。両方まぜて使えます。<br>追加してもクラス名や時間は残ります。<strong>日付だけ変えて「追加」を押していけば、同じクラスを続けて登録できます。</strong></p>
+</section>
+
+<!-- 3 -->
+<section class="panel">
+  <h2><span class="num">3</span>登録済みのクラス</h2>
+  <div id="list"></div>
+  <div class="row" style="margin-top:14px">
+    <button class="ghost mini" id="copyWeek">ある週を別の週にコピー</button>
+    <button class="ghost mini" id="undo">前の状態に戻す</button>
+    <button class="ghost mini" id="export">バックアップを保存</button>
+    <button class="ghost mini" id="importBtn">バックアップを読み込む</button>
+    <input type="file" id="importFile" accept="application/json" style="display:none">
+    <button class="ghost mini" id="clear">全部消す</button>
+  </div>
+  <p class="hint">「ある週を別の週にコピー」を使うと、1週間分を入れるだけで残りの週に複製できます。<br>変更のたびに直前の状態を自動で控えています。消してしまったときは「前の状態に戻す」から戻せます（直近20回分）。</p>
+</section>
+
+<!-- 4 -->
+<section class="panel" id="printArea">
+  <h2><span class="num">4</span>月間スケジュール</h2>
+  <div class="row" style="margin-bottom:12px">
+    <div style="min-width:200px">
+      <label>表の形</label>
+      <select id="viewMode">
+        <option value="calendar">カレンダー（時間帯なし）</option>
+        <option value="60">時間帯つき・1時間ごと</option>
+        <option value="30">時間帯つき・30分ごと</option>
+        <option value="0">時間帯つき・開始時刻ごと</option>
+      </select>
+    </div>
+    <div style="min-width:220px">
+      <label>横のそろえ方</label>
+      <select id="alignMode">
+        <option value="zone">午前・午後・夜でそろえる</option>
+        <option value="hour">時間帯できっちりそろえる</option>
+        <option value="none">そろえない（上から詰める）</option>
+      </select>
+    </div>
+  </div>
+  <div id="calHost"></div>
+  <div class="row" style="margin-top:12px">
+    <button class="ghost mini" id="printBtn">印刷 / PDFで保存</button>
+  </div>
+</section>
+
+<!-- 5 -->
+<section class="panel">
+  <h2><span class="num">5</span>Instagram用の画像</h2>
+  <div class="row" style="margin-bottom:12px">
+    <div style="min-width:200px">
+      <label>出力する形</label>
+      <select id="igMode">
+        <option value="month">月間カレンダー（1枚）</option>
+        <option value="week">週ごと</option>
+      </select>
+    </div>
+    <div style="min-width:220px">
+      <label>画像のサイズ</label>
+      <select id="igSize">
+        <option value="1350">縦長 4:5（タイムライン向き）</option>
+        <option value="1080">正方形 1:1（切れない）</option>
+        <option value="1920">ストーリー 9:16</option>
+      </select>
+    </div>
+    <div style="min-width:200px" id="weekWrap">
+      <label>どの週を出しますか</label>
+      <select id="weekSel"></select>
+    </div>
+    <button id="download">画像をダウンロード</button>
+  </div>
+  <canvas id="cv" width="1080" height="1350"></canvas>
+  <p class="hint">1080×1350（4:5）で書き出します。週ごとに出してカルーセル投稿にすると、1ヶ月分が1投稿にまとまります。</p>
+</section>
+
+</div>
+
+<script>
+const DAYS = ["日","月","火","水","木","金","土"];
+/* 並び順は変えないこと。登録済みクラスは番号で色を持っているため、
+   新しい色は必ず末尾に足す。自作の色は100番以降。 */
+const COLORS = [
+  {n:"グリーン",   bg:"#d9ead3", ink:"#31502a"},
+  {n:"イエロー",   bg:"#fdf2c4", ink:"#5c4a12"},
+  {n:"ピンク",     bg:"#fadadd", ink:"#6b2f38"},
+  {n:"ブルー",     bg:"#d6e6f5", ink:"#22415e"},
+  {n:"パープル",   bg:"#e4dcf1", ink:"#42305e"},
+  {n:"グレー",     bg:"#e8e4de", ink:"#4a443c"},
+  {n:"オレンジ",   bg:"#fbe0c9", ink:"#6b4420"},
+  {n:"ミント",     bg:"#d3efe6", ink:"#1f5348"},
+  {n:"スカイ",     bg:"#d5eef7", ink:"#1d4c5c"},
+  {n:"レモン",     bg:"#f2f5c8", ink:"#4e5514"},
+  {n:"ローズ",     bg:"#f6d8e8", ink:"#6b2b52"},
+  {n:"セージ",     bg:"#e2e9d4", ink:"#3f4a2a"},
+  {n:"ベージュ",   bg:"#f0e5d6", ink:"#5c4a35"},
+  {n:"モーヴ",     bg:"#e9d7e2", ink:"#5b3549"}
+];
+const CUSTOM_BASE = 100;
+/* クラス名は使う人が自分で登録する。ここにあるのは「例を入れる」で使う見本と、
+   旧バージョンから引き継ぐための一覧だけ。 */
+const SAMPLE_NAMES = [
+  "ハタヨガ","ヴィンヤサヨガ","アシュタンガヨガ","マイソール","パワーヨガ",
+  "リラックスヨガ","陰ヨガ","ビギナーヨガ","ピラティス","ストレッチ",
+  "筋膜リリース","瞑想クラス"
+];
+const LEGACY_NAMES = [
+  "マイソール","オンラインマイソール","マイソールビギナー","アシュタンガヨガ",
+  "アシュタンガビギナー","フルレッド","ピラティス","パワーフロー",
+  "コンディショニング","ベーシックヨガ","ビギナー美姿勢","リラックスヨガ",
+  "陰ヨガ","筋膜リリース","マッサージ","RYT200"
+];
+const KEY = "yogaSchedule.v2";
+const TIMES = (()=>{ const a=[]; for(let h=5;h<=23;h++) for(let m=0;m<60;m+=15)
+  a.push(String(h).padStart(2,"0")+":"+String(m).padStart(2,"0")); return a; })();
+
+let state = {title:"", year:0, month:0, classes:[]};
+const $ = id => document.getElementById(id);
+const iso = dt => dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0")+"-"+String(dt.getDate()).padStart(2,"0");
+// 属性値にも埋め込むので、引用符とスラッシュまで確実に潰す
+const esc = s => String(s == null ? "" : s).replace(/[&<>"'`]/g,
+  c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;","`":"&#96;"}[c]));
+// 色は必ず #rrggbb 形式に限定する（読み込んだファイル由来の値を style に入れるため）
+const safeColor = (v, fallback) => /^#[0-9a-fA-F]{6}$/.test(v) ? v : fallback;
+
+/* 保存領域が使えない環境（埋め込み・プライベートブラウズ）でも止まらないように */
+const store = {
+  get(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } },
+  set(k,v){ try{ localStorage.setItem(k,v); return true; }catch(e){ return false; } }
+};
+
+/* ---------- 読み込んだデータの検査 ---------- */
+const sStr  = (v, max) => (typeof v === "string" ? v : "").slice(0, max);
+const sNum  = (v, min, max, d) => { const n = Number(v); return Number.isFinite(n) ? Math.min(max, Math.max(min, Math.trunc(n))) : d; };
+const sTime = v => /^([01]\d|2[0-3]):[0-5]\d$/.test(v) ? v : "00:00";
+const sDate = v => /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/.test(v) ? v : null;
+
+function sanitizeState(d){
+  if(!d || typeof d !== "object") d = {};
+  const now = new Date();
+  return {
+    title: sStr(d.title, 60),
+    year:  sNum(d.year, 1970, 2999, now.getFullYear()),
+    month: sNum(d.month, 1, 12, now.getMonth()+1),
+    viewMode:  ["calendar","60","30","0"].includes(String(d.viewMode)) ? String(d.viewMode) : "calendar",
+    alignMode: ["zone","hour","none"].includes(d.alignMode) ? d.alignMode : "zone",
+    igMode:    d.igMode === "week" ? "week" : "month",
+    igSize:    [1080,1350,1920].includes(Number(d.igSize)) ? Number(d.igSize) : 1350,
+    customColors: (Array.isArray(d.customColors) ? d.customColors : []).slice(0,50).map(c => ({
+      n:  sStr(c && c.n, 30) || "色",
+      bg: safeColor(c && c.bg, "#e8e4de"),
+      ink: safeColor(c && c.ink, "#4a443c")
+    })),
+    classNames:   (Array.isArray(d.classNames)   ? d.classNames   : []).slice(0,300).map(n => sStr(n,60)).filter(Boolean),
+    teacherNames: (Array.isArray(d.teacherNames) ? d.teacherNames : []).slice(0,300).map(n => sStr(n,40)).filter(Boolean),
+    classes: (Array.isArray(d.classes) ? d.classes : []).slice(0,2000).map(c => {
+      c = c || {};
+      return {
+        repeat: !!c.repeat,
+        day:    sNum(c.day, 0, 6, 0),
+        date:   c.date ? sDate(c.date) : null,
+        start:  sTime(c.start),
+        end:    sTime(c.end),
+        name:   sStr(c.name, 60) || "クラス",
+        teacher: sStr(c.teacher, 40),
+        color:  sNum(c.color, 0, CUSTOM_BASE + 49, 5)
+      };
+    })
+  };
+}
+
+/* ---------- 初期化 ---------- */
+function init(){
+  const now = new Date();
+  for(let y=now.getFullYear()-1; y<=now.getFullYear()+2; y++) $("year").add(new Option(y+"年", y));
+  for(let m=1; m<=12; m++) $("month").add(new Option(m+"月", m));
+  TIMES.forEach(t => { $("f-start").add(new Option(t,t)); $("f-end").add(new Option(t,t)); });
+  $("f-start").value = "10:30";
+  $("f-end").value   = "11:30";
+
+  // 旧バージョン（曜日のみ）のデータも読めるようにする
+  const saved = store.get(KEY) || store.get("yogaSchedule.v1");
+  if(saved){
+    try{
+      const raw = JSON.parse(saved);
+      state = sanitizeState(raw);
+      // 旧形式（曜日のみ）はくり返し扱いにする
+      if(Array.isArray(raw.classes)) raw.classes.forEach((c,i) => {
+        if(state.classes[i] && c && c.repeat === undefined) state.classes[i].repeat = true;
+      });
+      if(!raw.classNames) state.classNames = null;
+      if(!raw.teacherNames) state.teacherNames = null;
+      if(!raw.viewMode) state.viewMode = null;
+      if(!raw.alignMode) state.alignMode = null;
+    }catch(e){ state = sanitizeState({}); }
+  }
+  if(!state.year){ state.year = now.getFullYear(); state.month = now.getMonth()+1; }
+  if(!state.classes) state.classes = [];
+  if(!state.customColors) state.customColors = [];
+  // 旧バージョンから来た人は、それまで選べていた一覧をそのまま引き継ぐ。
+  // まっさらな人は空から始めて、自分のスタジオのクラス名を登録してもらう。
+  if(!state.classNames) state.classNames = state.classes.length ? LEGACY_NAMES.slice() : [];
+  // 講師名は、すでに使っている名前をそのまま登録済みとして引き継ぐ
+  if(!state.teacherNames){
+    state.teacherNames = [...new Set(state.classes.map(c => c.teacher).filter(Boolean))];
+  }
+  state.classes.forEach(c => { if(c.repeat === undefined) c.repeat = true; });
+
+  $("title").value = state.title || "";
+  $("year").value = state.year;
+  $("month").value = state.month;
+  resetDateField();
+
+  $("title").oninput = () => { state.title = $("title").value; save(); redraw(); };
+  $("year").onchange = $("month").onchange = () => {
+    state.year = +$("year").value; state.month = +$("month").value;
+    resetDateField(); save(); redraw();
+  };
+  $("f-start").onchange = () => {
+    if($("f-end").value <= $("f-start").value){
+      const i = TIMES.indexOf($("f-start").value);
+      $("f-end").value = TIMES[Math.min(i+4, TIMES.length-1)];
+    }
+  };
+  $("toggleName").onclick = () => {
+    const b = $("nameBox");
+    b.style.display = b.style.display === "none" ? "block" : "none";
+  };
+  $("n-add").onclick = addClassName;
+  $("n-sample").onclick = loadSampleNames;
+  $("t-add").onclick = addTeacherName;
+  $("f-tpreset").onchange = () => {
+    if($("f-tpreset").value){ $("f-teacher").value = $("f-tpreset").value; $("f-tpreset").value = ""; }
+  };
+  $("toggleColor").onclick = () => {
+    const b = $("colorBox");
+    b.style.display = b.style.display === "none" ? "block" : "none";
+  };
+  $("c-add").onclick = addCustomColor;
+  if(!state.viewMode) state.viewMode = "calendar";
+  $("viewMode").value = state.viewMode;
+  $("viewMode").onchange = () => {
+    state.viewMode = $("viewMode").value; save(); renderCalendar();
+  };
+  if(!state.alignMode) state.alignMode = state.alignTime ? "hour" : "zone";
+  $("alignMode").value = state.alignMode;
+  $("alignMode").onchange = () => {
+    state.alignMode = $("alignMode").value; save(); redraw();
+  };
+  if(!state.igSize) state.igSize = 1350;
+  $("igSize").value = state.igSize;
+  $("igSize").onchange = () => { state.igSize = +$("igSize").value; save(); drawCanvas(); };
+  if(!state.igMode) state.igMode = "month";
+  $("igMode").value = state.igMode;
+  $("igMode").onchange = () => {
+    state.igMode = $("igMode").value; save();
+    $("weekWrap").style.display = state.igMode === "week" ? "" : "none";
+    drawCanvas();
+  };
+  $("weekWrap").style.display = state.igMode === "week" ? "" : "none";
+  $("f-preset").onchange = () => {
+    if($("f-preset").value){ $("f-name").value = $("f-preset").value; $("f-preset").value = ""; }
+  };
+  $("printBtn").onclick = () => window.print();
+  $("add").onclick = addClass;
+  $("copyWeek").onclick = copyWeek;
+  $("undo").onclick = restoreFromHistory;
+  $("clear").onclick = () => {
+    if(confirm("登録したクラスを全部消します。よろしいですか。")){ state.classes=[]; save(); redraw(); }
+  };
+  $("export").onclick = exportJSON;
+  $("importBtn").onclick = () => $("importFile").click();
+  $("importFile").onchange = importJSON;
+  $("download").onclick = downloadPNG;
+  $("weekSel").onchange = drawCanvas;
+
+  redraw();
+}
+/* 保存のたびに直前の状態を履歴に残す（最大20件）。消してしまっても戻せるように */
+const HISTKEY = "yogaSchedule.history";
+function save(){
+  const prev = store.get(KEY);
+  if(prev){
+    let h = [];
+    try{ h = JSON.parse(store.get(HISTKEY)) || []; }catch(e){}
+    const last = h[h.length-1];
+    if(!last || last.data !== prev){
+      h.push({at: new Date().toISOString(), data: prev});
+      if(h.length > 20) h = h.slice(-20);
+      store.set(HISTKEY, JSON.stringify(h));
+    }
+  }
+  store.set(KEY, JSON.stringify(state));
+}
+
+function restoreFromHistory(){
+  let h = [];
+  try{ h = JSON.parse(store.get(HISTKEY)) || []; }catch(e){}
+  if(!h.length){ alert("履歴がまだありません。"); return; }
+  const lines = h.map((s,i) => {
+    let n = "?"; try{ n = (JSON.parse(s.data).classes||[]).length; }catch(e){}
+    const d = new Date(s.at);
+    return (i+1)+": "+d.toLocaleString("ja-JP",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"})+"（"+n+"件）";
+  }).reverse().join("\n");
+  const ans = prompt("どの時点に戻しますか。番号で入れてください。\n新しい順に並んでいます。\n\n"+lines);
+  if(ans === null) return;
+  const item = h[+ans-1];
+  if(!item){ alert("番号が正しくありません。"); return; }
+  try{
+    const d = JSON.parse(item.data);
+    if(!d.classes) throw new Error();
+    save();                       // いまの状態も履歴に残してから
+    state = d;
+    if(!state.customColors) state.customColors = [];
+    state.classes.forEach(c => { if(c.repeat === undefined) c.repeat = true; });
+    $("title").value = state.title || "";
+    $("year").value = state.year; $("month").value = state.month;
+    store.set(KEY, JSON.stringify(state));
+    resetDateField(); redraw();
+    alert("戻しました。クラス"+state.classes.length+"件。");
+  }catch(e){ alert("この履歴は読めませんでした。"); }
+}
+function resetDateField(){ $("f-date").value = iso(new Date(state.year, state.month-1, 1)); }
+
+/* ---------- クラス操作 ---------- */
+function addClass(){
+  const name = $("f-name").value.trim();
+  if(!name){ alert("クラス名を入れてください。"); return; }
+  if(!$("f-date").value){ alert("日付を選んでください。"); return; }
+  if($("f-end").value <= $("f-start").value){ alert("終了時刻が開始時刻より前になっています。"); return; }
+
+  const dt = new Date($("f-date").value + "T00:00:00");
+  const repeat = $("f-repeat").value === "1";
+  const date = repeat ? null : $("f-date").value;
+
+  // 同じ内容の二重登録を止める（クラス名を残すぶん、押し間違いが起きやすいため）
+  const dup = state.classes.some(c =>
+    c.repeat === repeat && c.day === dt.getDay() && c.date === date &&
+    c.start === $("f-start").value && c.name === name
+  );
+  if(dup){ alert("同じクラスがすでに登録されています。"); return; }
+
+  state.classes.push({
+    repeat, day: dt.getDay(), date,
+    start: $("f-start").value, end: $("f-end").value,
+    name, teacher: $("f-teacher").value.trim(), color: +$("f-color").value
+  });
+  // クラス名・講師・時間・色はそのまま残す（日付だけ変えて続けて追加できる）
+  save(); redraw();
+}
+function removeClass(i){ state.classes.splice(i,1); save(); redraw(); }
+
+// その日のクラス（毎週くり返し＋その日だけ）
+function classesForDate(dt){
+  const d = iso(dt), w = dt.getDay();
+  return state.classes
+    .map((c,i) => ({...c, _i:i}))
+    .filter(c => c.repeat ? c.day === w : c.date === d)
+    .sort((a,b) => a.start.localeCompare(b.start));
+}
+
+/* ---------- 週のコピー ---------- */
+function copyWeek(){
+  const ws = weekStarts();
+  const labels = ws.map((d,i) => (i+1)+": "+(d.getMonth()+1)+"/"+d.getDate()).join("\n");
+  const from = prompt("どの週をコピーしますか。番号で入れてください。\n\n"+labels);
+  if(from === null) return;
+  const to = prompt("どの週に貼りますか。番号で入れてください。\n\n"+labels);
+  if(to === null) return;
+  const f = ws[+from-1], t = ws[+to-1];
+  if(!f || !t){ alert("番号が正しくありません。"); return; }
+
+  const diff = Math.round((t - f) / 86400000);
+  let n = 0;
+  const src = state.classes.filter(c => !c.repeat && c.date);
+  src.forEach(c => {
+    const cd = new Date(c.date + "T00:00:00");
+    if(cd >= f && cd < new Date(f.getTime() + 7*86400000)){
+      const nd = new Date(cd.getTime() + diff*86400000);
+      if(nd.getMonth() !== state.month-1) return;
+      state.classes.push({...c, date: iso(nd), day: nd.getDay()});
+      n++;
+    }
+  });
+  save(); redraw();
+  alert(n ? n+"件コピーしました。" : "コピー元の週に「この日だけ」のクラスがありませんでした。");
+}
+
+/* ---------- 描画 ---------- */
+function redraw(){
+  buildNameOptions(); renderNameManageList();
+  buildTeacherOptions(); renderTeacherManageList();
+  buildColorOptions(); renderCustomList();
+  renderList(); renderCalendar(); buildWeekOptions(); drawCanvas();
+}
+
+/* ---------- 色 ---------- */
+// 番号から色を引く。100番以降は自作の色。消された色を指していても落ちないようにする
+function colorOf(i){
+  const c = (i >= CUSTOM_BASE ? state.customColors[i - CUSTOM_BASE] : COLORS[i]) || COLORS[5];
+  return { n: c.n, bg: safeColor(c.bg, COLORS[5].bg), ink: safeColor(c.ink, COLORS[5].ink) };
+}
+function buildColorOptions(){
+  const sel = $("f-color"), prev = sel.value;
+  sel.innerHTML = "";
+  COLORS.forEach((c,i) => sel.add(new Option(c.n, i)));
+  state.customColors.forEach((c,i) => sel.add(new Option(c.n+"（自作）", CUSTOM_BASE+i)));
+  if(prev !== "" && [...sel.options].some(o => o.value === prev)) sel.value = prev;
+}
+// 背景が明るければ濃い文字、暗ければ白文字
+function inkFor(bg){
+  const r = parseInt(bg.slice(1,3),16), g = parseInt(bg.slice(3,5),16), b = parseInt(bg.slice(5,7),16);
+  const lum = (0.299*r + 0.587*g + 0.114*b) / 255;
+  if(lum > 0.6){
+    return "#" + [r,g,b].map(v => Math.round(v*0.32).toString(16).padStart(2,"0")).join("");
+  }
+  return "#ffffff";
+}
+function addCustomColor(){
+  const n = $("c-name").value.trim();
+  if(!n){ alert("色の名前を入れてください。"); return; }
+  const bg = $("c-bg").value;
+  state.customColors.push({n, bg, ink: inkFor(bg)});
+  $("c-name").value = "";
+  save(); redraw();
+  $("f-color").value = CUSTOM_BASE + state.customColors.length - 1;
+}
+function removeCustomColor(i){
+  const used = state.classes.filter(c => c.color === CUSTOM_BASE+i).length;
+  if(used && !confirm("この色を使っているクラスが"+used+"件あります。消すとグレーになります。よろしいですか。")) return;
+  state.customColors.splice(i,1);
+  // 後ろの色を指していた番号を詰める
+  state.classes.forEach(c => {
+    if(c.color === CUSTOM_BASE+i) c.color = 5;
+    else if(c.color > CUSTOM_BASE+i) c.color--;
+  });
+  save(); redraw();
+}
+function renderCustomList(){
+  const host = $("customList");
+  if(!host) return;
+  host.innerHTML = "";
+  if(!state.customColors.length){
+    host.innerHTML = '<div class="empty">自作の色はまだありません。</div>';
+    return;
+  }
+  state.customColors.forEach((c,i) => {
+    const el = document.createElement("div");
+    el.className = "item";
+    el.innerHTML = '<span class="swatch" style="background:'+safeColor(c.bg,"#e8e4de")+'"></span><span class="nm"></span>';
+    el.querySelector(".nm").textContent = c.n;
+    const b = document.createElement("button");
+    b.className = "ghost mini"; b.textContent = "削除";
+    b.style.marginLeft = "auto";
+    b.onclick = () => removeCustomColor(i);
+    el.appendChild(b);
+    host.appendChild(el);
+  });
+}
+
+// 選べるクラス名＝自分で登録した一覧＋スケジュールに使った名前
+function allNames(){
+  const reg = state.classNames || [];
+  const used = [...new Set(state.classes.map(c => c.name))].filter(n => n && !reg.includes(n));
+  return reg.concat(used.sort());
+}
+function buildNameOptions(){
+  const names = allNames();
+
+  const sel = $("f-preset");
+  sel.innerHTML = "";
+  sel.add(new Option(names.length ? "選んでください" : "（クラス名を登録してください）", ""));
+  names.forEach(n => sel.add(new Option(n, n)));
+  sel.value = "";
+
+  $("nameList").innerHTML = names.map(n => '<option value="'+esc(n)+'">').join("");
+}
+
+/* ---------- クラス名の登録 ---------- */
+function addClassName(){
+  const n = $("n-name").value.trim();
+  if(!n){ alert("クラス名を入れてください。"); return; }
+  if(state.classNames.includes(n)){ alert("すでに登録されています。"); return; }
+  state.classNames.push(n);
+  $("n-name").value = "";
+  save(); redraw();
+}
+// 一覧から消すだけ。登録済みのスケジュールには影響しないので確認は出さない
+function removeClassName(i){
+  state.classNames.splice(i,1);
+  save(); redraw();
+}
+function loadSampleNames(){
+  const add = SAMPLE_NAMES.filter(n => !state.classNames.includes(n));
+  if(!add.length){ alert("例はすでに入っています。"); return; }
+  state.classNames = state.classNames.concat(add);
+  save(); redraw();
+  alert(add.length+"件入れました。使わないものは削除してください。");
+}
+/* ---------- 講師名の登録 ---------- */
+function allTeachers(){
+  const reg = state.teacherNames || [];
+  const used = [...new Set(state.classes.map(c => c.teacher))].filter(t => t && !reg.includes(t));
+  return reg.concat(used.sort());
+}
+function buildTeacherOptions(){
+  const names = allTeachers();
+  const sel = $("f-tpreset");
+  sel.innerHTML = "";
+  sel.add(new Option(names.length ? "選んでください" : "（講師名を登録してください）", ""));
+  names.forEach(n => sel.add(new Option(n, n)));
+  sel.value = "";
+  $("teacherList").innerHTML = names.map(n => '<option value="'+esc(n)+'">').join("");
+}
+function addTeacherName(){
+  const n = $("t-name").value.trim();
+  if(!n){ alert("講師名を入れてください。"); return; }
+  if(state.teacherNames.includes(n)){ alert("すでに登録されています。"); return; }
+  state.teacherNames.push(n);
+  $("t-name").value = "";
+  save(); redraw();
+}
+// 一覧から消すだけ。登録済みのスケジュールには影響しないので確認は出さない
+function removeTeacherName(i){
+  state.teacherNames.splice(i,1);
+  save(); redraw();
+}
+function renderTeacherManageList(){
+  const host = $("teacherManageList");
+  if(!host) return;
+  host.innerHTML = "";
+  if(!state.teacherNames.length){
+    host.innerHTML = '<div class="empty">登録された講師名はまだありません。</div>';
+    return;
+  }
+  state.teacherNames.forEach((n,i) => {
+    const el = document.createElement("div");
+    el.className = "item";
+    el.innerHTML = '<span class="nm"></span>';
+    el.querySelector(".nm").textContent = n;
+    const b = document.createElement("button");
+    b.className = "ghost mini"; b.textContent = "削除";
+    b.style.marginLeft = "auto";
+    b.onclick = () => removeTeacherName(i);
+    el.appendChild(b);
+    host.appendChild(el);
+  });
+}
+
+function renderNameManageList(){
+  const host = $("nameManageList");
+  if(!host) return;
+  host.innerHTML = "";
+  if(!state.classNames.length){
+    host.innerHTML = '<div class="empty">登録されたクラス名はまだありません。</div>';
+    return;
+  }
+  state.classNames.forEach((n,i) => {
+    const el = document.createElement("div");
+    el.className = "item";
+    el.innerHTML = '<span class="nm"></span>';
+    el.querySelector(".nm").textContent = n;
+    const b = document.createElement("button");
+    b.className = "ghost mini"; b.textContent = "削除";
+    b.style.marginLeft = "auto";
+    b.onclick = () => removeClassName(i);
+    el.appendChild(b);
+    host.appendChild(el);
+  });
+}
+
+function itemEl(c, whenLabel){
+  const el = document.createElement("div");
+  el.className = "item";
+  el.innerHTML =
+    '<span class="swatch" style="background:'+colorOf(c.color).bg+'"></span>'+
+    '<span class="when"></span><span class="nm"></span><span class="tc"></span>';
+  el.querySelector(".when").textContent = whenLabel+" "+c.start+"–"+c.end;
+  el.querySelector(".nm").textContent = c.name;
+  el.querySelector(".tc").textContent = c.teacher;
+  const b = document.createElement("button");
+  b.className = "ghost mini"; b.textContent = "削除";
+  b.onclick = () => removeClass(c._i);
+  el.appendChild(b);
+  return el;
+}
+
+function renderList(){
+  const host = $("list");
+  host.innerHTML = "";
+  const all = state.classes.map((c,i) => ({...c, _i:i}));
+  if(!all.length){
+    host.innerHTML = '<div class="empty">まだクラスがありません。上のフォームから追加してください。</div>';
+    return;
+  }
+  const rep = all.filter(c => c.repeat).sort((a,b) => a.day-b.day || a.start.localeCompare(b.start));
+  const one = all.filter(c => !c.repeat).sort((a,b) => (a.date+a.start).localeCompare(b.date+b.start));
+
+  if(rep.length){
+    host.insertAdjacentHTML("beforeend", '<div class="sub-h">毎週くり返し</div>');
+    const box = document.createElement("div"); box.className = "list";
+    rep.forEach(c => box.appendChild(itemEl(c, "毎週"+DAYS[c.day])));
+    host.appendChild(box);
+  }
+  if(one.length){
+    host.insertAdjacentHTML("beforeend", '<div class="sub-h">この日だけ</div>');
+    const box = document.createElement("div"); box.className = "list";
+    one.forEach(c => {
+      const d = new Date(c.date+"T00:00:00");
+      box.appendChild(itemEl(c, (d.getMonth()+1)+"/"+d.getDate()+"("+DAYS[d.getDay()]+")"));
+    });
+    host.appendChild(box);
+  }
+}
+
+/* 左の時間の刻み。開始時刻をその区切りに丸めて、同じ行にまとめる */
+function slotUnitNow(){ return +state.viewMode || 0; }
+function slotKey(start){
+  const unit = slotUnitNow();
+  if(!unit) return start;                       // クラスの開始時刻ごと
+  const [h,m] = start.split(":").map(Number);
+  const mm = Math.floor(m / unit) * unit;
+  return String(h).padStart(2,"0")+":"+String(mm).padStart(2,"0");
+}
+function slotLabel(key){
+  return slotUnitNow() === 60 ? Number(key.slice(0,2)) + "時台" : key;
+}
+
+const hourKey = t => t.slice(0,2)+":00";
+// 午前 / 午後 / 夜 の3ゾーン
+const zoneOf = t => t < "12:00" ? 0 : t < "17:00" ? 1 : 2;
+const ZONE_NAMES = ["午前","午後","夜"];
+function chipHTML(c){
+  const col = colorOf(c.color);
+  return '<div class="chip" style="background:'+col.bg+';color:'+col.ink+'">'+
+         '<span class="t">'+c.start+'〜'+c.end+'</span>'+
+         '<b>'+esc(c.name)+'</b>'+
+         (c.teacher ? '<span>'+esc(c.teacher)+'</span>' : '')+'</div>';
+}
+
+/* カレンダー形式：時間帯の行を作らず、日付のマスにクラスを時間順に積む */
+function renderCalendarGrid(){
+  const m = state.month, lastDay = new Date(state.year, m, 0).getDate();
+  const moons = moonMap(state.year, m);
+  const aligned = state.alignMode !== "none";
+
+  let html = '<table class="cal grid-cal'+(aligned ? ' aligned' : '')+'"><thead><tr>';
+  DAYS.forEach((d,i) => html += '<th class="'+(i===0?"sun":i===6?"sat":"")+'">'+d+'</th>');
+  html += '</tr></thead><tbody>';
+
+  weekStarts().forEach(start => {
+    const days = [];
+    for(let i=0;i<7;i++){
+      const dt = new Date(start); dt.setDate(start.getDate() - start.getDay() + i);
+      const ok = dt.getMonth() === m-1 && dt.getDate() >= 1 && dt.getDate() <= lastDay;
+      days.push(ok ? dt : null);
+    }
+
+    // 横をそろえる場合、その週の区切りと、区切りごとの最大クラス数を先に出す
+    const keyOf = state.alignMode === "hour" ? (c => hourKey(c.start)) : (c => String(zoneOf(c.start)));
+    let bands = null, bandMax = {};
+    if(aligned){
+      bands = [...new Set(days.filter(Boolean).flatMap(dt => classesForDate(dt).map(keyOf)))].sort();
+      bands.forEach(b => {
+        bandMax[b] = Math.max(...days.map(dt => dt ? classesForDate(dt).filter(c => keyOf(c) === b).length : 0));
+      });
+    }
+
+    html += '<tr>';
+    days.forEach((dt,i) => {
+      if(!dt){ html += '<td class="out"></td>'; return; }
+      const list = classesForDate(dt);
+      const moon = moons[iso(dt)];
+      html += '<td class="'+(i===0?"sun":i===6?"sat":"")+'">'+
+              '<div class="dnum">'+dt.getDate()+
+              (moon ? '<span class="moon">'+(moon==="新月"?"🌑":"🌕")+moon+'</span>' : '')+'</div>';
+
+      if(!list.length){
+        html += '<div class="rest">休み</div>';
+      } else if(!aligned){
+        list.forEach(c => html += chipHTML(c));
+      } else {
+        bands.forEach(b => {
+          const hits = list.filter(c => keyOf(c) === b);
+          hits.forEach(c => html += chipHTML(c));
+          for(let n = hits.length; n < bandMax[b]; n++) html += '<div class="spacer"></div>';
+        });
+      }
+      html += '</td>';
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  $("calHost").innerHTML = html;
+}
+
+/* 月間ビュー：1ヶ月をひと続きの表に。曜日の列は固定、時間帯の行で横に揃う */
+function renderCalendar(){
+  if(state.viewMode === "calendar") return renderCalendarGrid();
+  const m = state.month, lastDay = new Date(state.year, m, 0).getDate();
+
+  // 見出し（曜日は固定）
+  let html = '<table class="cal"><thead><tr><th class="tcol">時間</th>';
+  DAYS.forEach((d,i) => {
+    html += '<th class="'+(i===0?"sun":i===6?"sat":"")+'">'+d+'</th>';
+  });
+  html += '</tr></thead><tbody>';
+
+  weekStarts().forEach(start => {
+    const dates = [];
+    for(let i=0;i<7;i++){
+      const dt = new Date(start); dt.setDate(start.getDate() - start.getDay() + i);
+      dates.push(dt.getMonth() === m-1 && dt.getDate() >= 1 && dt.getDate() <= lastDay ? dt : null);
+    }
+    const slots = [...new Set(
+      dates.filter(Boolean).flatMap(dt => classesForDate(dt).map(c => slotKey(c.start)))
+    )].sort();
+
+    // 週の頭に日付の行を挟む
+    html += '<tr class="drow"><td class="tcol"></td>';
+    dates.forEach((dt,i) => {
+      html += '<td class="'+(dt ? (i===0?"sun":i===6?"sat":"") : "out")+'">'+(dt ? dt.getDate() : "")+'</td>';
+    });
+    html += '</tr>';
+
+    if(!slots.length){
+      html += '<tr><td class="tcol">—</td><td colspan="7" class="none">クラスなし</td></tr>';
+    }
+    slots.forEach(t => {
+      html += '<tr><td class="tcol">'+slotLabel(t)+'</td>';
+      dates.forEach(dt => {
+        if(!dt){ html += '<td class="out"></td>'; return; }
+        html += '<td>';
+        classesForDate(dt).filter(c => slotKey(c.start) === t).forEach(c => {
+          const col = colorOf(c.color);
+          html += '<div class="chip" style="background:'+col.bg+';color:'+col.ink+'">'+
+                  '<span class="t">'+c.start+'〜'+c.end+'</span>'+
+                  '<b>'+esc(c.name)+'</b>'+
+                  (c.teacher ? '<span>'+esc(c.teacher)+'</span>' : '')+'</div>';
+        });
+        html += '</td>';
+      });
+      html += '</tr>';
+    });
+  });
+
+  html += '</tbody></table>';
+  $("calHost").innerHTML = html;
+}
+
+/* ---------- 新月・満月（Meeus の朔望計算・日本時間） ---------- */
+const D2R = Math.PI/180;
+function moonPhaseJD(k){                        // k が整数=新月、+0.5=満月
+  const T = k/1236.85;
+  let jde = 2451550.09766 + 29.530588861*k + 0.00015437*T*T - 0.000000150*T*T*T;
+  const E  = 1 - 0.002516*T - 0.0000074*T*T;
+  const M  = (2.5534 + 29.10535670*k - 0.0000014*T*T) * D2R;
+  const M1 = (201.5643 + 385.81693528*k + 0.0107582*T*T) * D2R;
+  const F  = (160.7108 + 390.67050284*k - 0.0016118*T*T) * D2R;
+  const O  = (124.7746 - 1.56375588*k + 0.0020672*T*T) * D2R;
+  const isNew = Math.abs(k - Math.round(k)) < 0.01;
+  const s = Math.sin;
+  jde += (isNew ? -0.40720 : -0.40614)*s(M1)
+       + (isNew ?  0.17241 :  0.17302)*E*s(M)
+       + (isNew ?  0.01608 :  0.01614)*s(2*M1)
+       + (isNew ?  0.01039 :  0.01043)*s(2*F)
+       + (isNew ?  0.00739 :  0.00734)*E*s(M1-M)
+       - (isNew ?  0.00514 :  0.00515)*E*s(M1+M)
+       + (isNew ?  0.00208 :  0.00209)*E*E*s(2*M)
+       - 0.00111*s(M1-2*F) - 0.00057*s(M1+2*F) + 0.00056*E*s(2*M1+M)
+       - 0.00042*s(3*M1) + 0.00042*E*s(M+2*F) + 0.00038*E*s(M-2*F)
+       - 0.00024*E*s(2*M1-M) - 0.00017*s(O) - 0.00007*s(M1+2*M);
+  return jde;
+}
+function jdToJstDate(jd){
+  const ms = (jd - 2440587.5) * 86400000 + 9*3600000;   // UTC→JST
+  const d = new Date(ms);
+  return d.getUTCFullYear()+"-"+String(d.getUTCMonth()+1).padStart(2,"0")+"-"+String(d.getUTCDate()).padStart(2,"0");
+}
+// その月の新月・満月を { "2026-08-13": "新月", ... } の形で返す
+function moonMap(year, month){
+  const out = {};
+  const k0 = Math.floor((year + (month-0.5)/12 - 2000) * 12.3685);
+  for(let k = k0-2; k <= k0+2; k++){
+    out[jdToJstDate(moonPhaseJD(k))] = "新月";
+    out[jdToJstDate(moonPhaseJD(k+0.5))] = "満月";
+  }
+  return out;
+}
+
+/* ---------- 週 ---------- */
+function weekStarts(){
+  const y = state.year, m = state.month;
+  const last = new Date(y, m, 0).getDate();
+  const out = [];
+  for(let d=1; d<=last; d++){
+    const dt = new Date(y, m-1, d);
+    if(dt.getDay() === 0 || d === 1) out.push(dt);
+  }
+  return out;
+}
+function weekEnd(dt){
+  const end = new Date(dt); end.setDate(end.getDate() + (6 - dt.getDay()));
+  const lastDay = new Date(state.year, state.month, 0);
+  return end > lastDay ? lastDay : end;
+}
+function buildWeekOptions(){
+  const sel = $("weekSel"), prev = sel.value;
+  sel.innerHTML = "";
+  weekStarts().forEach((dt,i) => {
+    const end = weekEnd(dt);
+    sel.add(new Option((dt.getMonth()+1)+"/"+dt.getDate()+" 〜 "+(end.getMonth()+1)+"/"+end.getDate(), i));
+  });
+  if(prev !== "" && prev < sel.options.length) sel.value = prev;
+}
+
+/* ---------- Instagram画像 ---------- */
+const FONT = '"Hiragino Sans","Noto Sans JP",sans-serif';
+
+function drawCanvas(){
+  const cv = $("cv");
+  cv.width = 1080;
+  cv.height = +(state.igSize || 1350);
+  if(state.igMode === "week") return drawWeekImage();
+  drawMonthImage();
+}
+
+/* 月間カレンダーを1枚の画像に */
+function drawMonthImage(){
+  const cv = $("cv"), g = cv.getContext("2d");
+  const W = cv.width, H = cv.height, P = 30;
+  g.fillStyle = "#faf8f5"; g.fillRect(0,0,W,H);
+  g.textBaseline = "top";
+
+  // 見出し
+  g.fillStyle = "#2e2a26"; g.font = "bold 40px " + FONT;
+  g.fillText(state.title || "ヨガクラス スケジュール", P, 26);
+  g.fillStyle = "#7a726a"; g.font = "26px " + FONT;
+  g.fillText(state.year + "年" + state.month + "月", P, 74);
+
+  const moons = moonMap(state.year, state.month);
+  const weeks = weekStarts();
+  const top = 120, colW = (W - P*2) / 7, headH = 34;
+  const gridTop = top + headH;
+  const rowH = (H - gridTop - P) / weeks.length;
+  const lastDay = new Date(state.year, state.month, 0).getDate();
+
+  // 曜日の見出し
+  DAYS.forEach((d,i) => {
+    const x = P + i*colW;
+    g.fillStyle = i===0 ? "#c0554d" : i===6 ? "#4d6fa8" : "#6b645c";
+    g.font = "bold 22px " + FONT;
+    const w = g.measureText(d).width;
+    g.fillText(d, x + (colW-w)/2, top + 4);
+  });
+
+  const gap = 2, zoneGap = 5, top0 = 26, textW = colW - 16;
+
+  function drawChip(it, x, cy){
+    const col = colorOf(it.c.color);
+    g.fillStyle = col.bg;
+    roundRect(g, x+4, cy, colW-8, it.h, 5); g.fill();
+    g.fillStyle = col.ink;
+    g.font = "12px " + FONT;
+    g.fillText(it.c.start+"〜"+it.c.end, x+8, cy+2);
+    g.font = "bold 13px " + FONT;
+    it.lines.forEach((ln,li) => g.fillText(ln, x+8, cy+15+li*15));
+  }
+
+  weeks.forEach((start, wi) => {
+    const avail = rowH - top0 - 3;
+
+    // その週の各日のクラスを、折り返し行数まで含めて先に測る
+    g.font = "bold 13px " + FONT;
+    const dayItems = [];
+    for(let i=0;i<7;i++){
+      const dt = new Date(start); dt.setDate(start.getDate() - start.getDay() + i);
+      const inM = dt.getMonth() === state.month-1;
+      dayItems.push(inM ? classesForDate(dt).map(c => {
+        const lines = wrapLines(g, c.name, textW, 2);
+        return { c, lines, h: 15 + lines.length*15 };
+      }) : []);
+    }
+
+    // 午前・午後・夜のゾーンごとに、その週でいちばん高い日に合わせる
+    const useZones = state.alignMode !== "none";
+    const zoneH = [0,0,0], zoneTop = [0,0,0];
+    if(useZones){
+      for(let z=0; z<3; z++){
+        zoneH[z] = Math.max(0, ...dayItems.map(items => {
+          const inZ = items.filter(it => zoneOf(it.c.start) === z);
+          return inZ.reduce((s,it) => s + it.h, 0) + Math.max(0, inZ.length-1)*gap;
+        }));
+      }
+      let acc = 0;
+      for(let z=0; z<3; z++){ zoneTop[z] = acc; if(zoneH[z] > 0) acc += zoneH[z] + zoneGap; }
+    }
+    // ゾーンの高さ（その日の残りぶん）。詰まっている日は上に寄せて必ず収める
+    const zoneRemain = items => [0,1,2].map(z => {
+      const rest = items.filter(it => zoneOf(it.c.start) >= z);
+      return rest.reduce((s,it) => s + it.h, 0) + Math.max(0, rest.length-1)*gap;
+    });
+
+    for(let i=0;i<7;i++){
+      const dt = new Date(start); dt.setDate(start.getDate() - start.getDay() + i);
+      const x = P + i*colW, y = gridTop + wi*rowH;
+      const inMonth = dt.getMonth() === state.month-1 && dt.getDate() >= 1 && dt.getDate() <= lastDay;
+
+      g.strokeStyle = "#e4ddd4"; g.lineWidth = 1;
+      g.strokeRect(x, y, colW, rowH);
+      if(!inMonth){ g.fillStyle = "#f3efe9"; g.fillRect(x+1, y+1, colW-2, rowH-2); continue; }
+
+      g.fillStyle = dt.getDay()===0 ? "#c0554d" : dt.getDay()===6 ? "#4d6fa8" : "#2e2a26";
+      g.font = "bold 20px " + FONT;
+      g.fillText(dt.getDate(), x+7, y+5);
+
+      const moon = moons[iso(dt)];
+      if(moon){
+        g.font = "13px " + FONT;
+        g.fillStyle = "#7a726a";
+        const mk = (moon === "新月" ? "🌑" : "🌕") + moon;
+        g.fillText(mk, x + colW - 8 - g.measureText(mk).width, y+8);
+      }
+
+      const items = dayItems[i];
+      if(!items.length){
+        g.fillStyle = "#b0a89f"; g.font = "15px " + FONT;
+        g.fillText("休み", x+8, y+32);
+        continue;
+      }
+
+      let shown = 0;
+      // その日のクラスが全部入る場合だけゾーンでそろえる。入らない日は詰めて表示
+      if(useZones && zoneRemain(items)[0] <= avail){
+        const bottom = y + rowH - 3;
+        const remain = zoneRemain(items);
+        let cursor = y + top0;
+        for(let z=0; z<3; z++){
+          const inZ = items.filter(it => zoneOf(it.c.start) === z);
+          if(!inZ.length) continue;
+          // そろえたい位置まで下げる。ただし下にはみ出さない範囲で
+          cursor = Math.min(Math.max(cursor, y + top0 + zoneTop[z]), bottom - remain[z]);
+          inZ.forEach(it => { drawChip(it, x, cursor); cursor += it.h + gap; shown++; });
+        }
+      } else {
+        const bottom = y + rowH - 3;
+        let cy = y + top0;
+        for(const it of items){
+          const reserve = (items.length - shown) > 1 ? 16 : 0;
+          if(cy + (shown ? gap : 0) + it.h + reserve > bottom) break;
+          if(shown) cy += gap;
+          drawChip(it, x, cy);
+          cy += it.h; shown++;
+        }
+        if(shown < items.length){
+          g.fillStyle = "#8a8078"; g.font = "12px " + FONT;
+          g.fillText("ほか"+(items.length-shown)+"件", x+8, cy+4);
+        }
+      }
+    }
+  });
+}
+
+// 幅に収まるように末尾を詰める
+function fit(g, text, maxW){
+  if(g.measureText(text).width <= maxW) return text;
+  let t = text;
+  while(t.length > 1 && g.measureText(t+"…").width > maxW) t = t.slice(0,-1);
+  return t + "…";
+}
+
+/* 日本語の折り返し。行頭に来てはいけない文字を避け、
+   区切り文字や文字種の変わり目で折る */
+const NO_START = "ーゝゞャュョッァィゥェォヵヶぁぃぅぇぉっゃゅょ）」』】〕、。，．！？・：；％%";
+const OPEN_BRACKET = "（「『【〔(";
+const BREAK_AFTER = " 　×✕＋+・／/、,";
+
+function charKind(ch){
+  if(/[ァ-ヴー]/.test(ch)) return "kata";
+  if(/[ぁ-ん]/.test(ch)) return "hira";
+  if(/[一-龥々]/.test(ch)) return "kanji";
+  if(/[A-Za-z0-9]/.test(ch)) return "alnum";
+  return "other";
+}
+
+function bestBreak(s, n){
+  const floorIdx = Math.max(1, Math.ceil(n * 0.3));   // 1行目が短くなりすぎない範囲
+  // 1) 区切り文字の直後で折る
+  for(let i=n; i>=floorIdx; i--){
+    if(BREAK_AFTER.includes(s[i-1]) && !NO_START.includes(s[i])) return i;
+  }
+  // 2) 開きカッコの直前で折る
+  for(let i=n; i>=floorIdx; i--){
+    if(OPEN_BRACKET.includes(s[i])) return i;
+  }
+  // 3) 文字種の変わり目で折る（カタカナ→漢字 など）
+  for(let i=n; i>=floorIdx; i--){
+    if(charKind(s[i-1]) !== charKind(s[i]) && !NO_START.includes(s[i])) return i;
+  }
+  // 4) 行頭禁則だけ回避
+  let i = n;
+  while(i > 1 && NO_START.includes(s[i])) i--;
+  // 5) 最後の行が1文字だけになるのを避ける
+  if(s.length - i === 1 && i > 1){
+    i--;
+    while(i > 1 && NO_START.includes(s[i])) i--;
+  }
+  return i;
+}
+
+function wrapLines(g, text, maxW, maxLines){
+  const lines = [];
+  let rest = text;
+  while(rest.length){
+    if(g.measureText(rest).width <= maxW){ lines.push(rest); return lines; }
+    if(lines.length === maxLines - 1){          // 最終行は入るところまで
+      let t = rest;
+      while(t.length > 1 && g.measureText(t+"…").width > maxW) t = t.slice(0,-1);
+      lines.push(t+"…");
+      return lines;
+    }
+    let n = 1;
+    while(n < rest.length && g.measureText(rest.slice(0, n+1)).width <= maxW) n++;
+    n = bestBreak(rest, n);
+    lines.push(rest.slice(0, n));
+    rest = rest.slice(n);
+  }
+  return lines;
+}
+
+function drawWeekImage(){
+  const cv = $("cv"), g = cv.getContext("2d");
+  const W = cv.width, H = cv.height, P = 56;
+
+  g.fillStyle = "#faf8f5"; g.fillRect(0,0,W,H);
+
+  const starts = weekStarts();
+  const start = starts[+($("weekSel").value || 0)] || new Date(state.year, state.month-1, 1);
+  const end = weekEnd(start);
+
+  g.textBaseline = "top";
+  g.fillStyle = "#2e2a26"; g.font = "bold 46px " + FONT;
+  g.fillText(state.title || "ヨガクラス スケジュール", P, P);
+  g.fillStyle = "#7a726a"; g.font = "30px " + FONT;
+  g.fillText((start.getMonth()+1)+"月"+start.getDate()+"日 〜 "+(end.getMonth()+1)+"月"+end.getDate()+"日", P, P+62);
+  g.strokeStyle = "#e0d9d0"; g.lineWidth = 2;
+  g.beginPath(); g.moveTo(P, P+118); g.lineTo(W-P, P+118); g.stroke();
+
+  const days = [];
+  for(let i=0; i<7-start.getDay(); i++){
+    const dt = new Date(start); dt.setDate(start.getDate()+i);
+    if(dt.getMonth() !== state.month-1) break;
+    days.push({dt, list: classesForDate(dt)});
+  }
+
+  const top = P+140, bottom = H-P, headH = 44, gapY = 10;
+  const totalRows = days.reduce((s,d) => s + Math.max(1, d.list.length), 0) || 1;
+  let lineH = (bottom - top - days.length*(headH+gapY)) / totalRows;
+  lineH = Math.max(34, Math.min(58, lineH));
+
+  let y = top;
+  days.forEach(d => {
+    const dow = d.dt.getDay();
+    g.fillStyle = dow===0 ? "#c0554d" : dow===6 ? "#4d6fa8" : "#2e2a26";
+    g.font = "bold 30px " + FONT;
+    g.fillText(d.dt.getDate()+"日（"+DAYS[dow]+"）", P, y+6);
+    y += headH;
+
+    if(!d.list.length){
+      g.fillStyle = "#b8b0a6"; g.font = "26px " + FONT;
+      g.fillText("お休み", P+18, y+4);
+      y += lineH + gapY; return;
+    }
+
+    d.list.forEach(c => {
+      const col = colorOf(c.color), h = lineH-6, ty = y + (h-28)/2;
+      g.fillStyle = col.bg; roundRect(g, P, y, W-P*2, h, 8); g.fill();
+      g.fillStyle = col.ink;
+
+      let teacherW = 0;
+      if(c.teacher){
+        g.font = "23px " + FONT;
+        teacherW = g.measureText(c.teacher).width;
+        g.fillText(c.teacher, W-P-16-teacherW, y + (h-26)/2);
+      }
+      g.font = "bold 26px " + FONT;
+      const ts = c.start+"–"+c.end;
+      g.fillText(ts, P+16, ty);
+      const tw = g.measureText(ts).width;
+
+      g.font = "26px " + FONT;
+      const nx = P+16+tw+28, maxW = (W-P-16-teacherW-24) - nx;
+      let nm = c.name;
+      if(g.measureText(nm).width > maxW){
+        while(nm.length > 1 && g.measureText(nm+"…").width > maxW) nm = nm.slice(0,-1);
+        nm += "…";
+      }
+      g.fillText(nm, nx, ty);
+      y += lineH;
+    });
+    y += gapY;
+  });
+}
+function roundRect(g,x,y,w,h,r){
+  g.beginPath(); g.moveTo(x+r,y);
+  g.arcTo(x+w,y,x+w,y+h,r); g.arcTo(x+w,y+h,x,y+h,r);
+  g.arcTo(x,y+h,x,y,r); g.arcTo(x,y,x+w,y,r); g.closePath();
+}
+function downloadPNG(){
+  const a = document.createElement("a");
+  const base = "schedule_"+state.year+"-"+String(state.month).padStart(2,"0");
+  a.download = (state.igMode === "week" ? base+"_w"+(+$("weekSel").value+1) : base) + ".png";
+  a.href = $("cv").toDataURL("image/png");
+  a.click();
+}
+
+/* ---------- バックアップ ---------- */
+function exportJSON(){
+  const a = document.createElement("a");
+  a.download = "yoga-schedule-backup.json";
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(state,null,2)], {type:"application/json"}));
+  a.click();
+}
+function importJSON(e){
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try{
+      const d = JSON.parse(r.result);
+      if(!d || !Array.isArray(d.classes)) throw new Error();
+      state = sanitizeState(d);          // 受け取ったファイルは必ず検査してから使う
+      $("title").value = state.title || "";
+      $("year").value = state.year; $("month").value = state.month;
+      resetDateField(); save(); redraw();
+    }catch(err){ alert("読み込めませんでした。バックアップファイルを確認してください。"); }
+  };
+  r.readAsText(f);
+  e.target.value = "";
+}
+
+init();
+</script>
+</body>
+</html>

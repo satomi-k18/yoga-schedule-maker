@@ -1,0 +1,5 @@
+# 実データは公開しない（スタジオ名・講師名・スケジュールが入っているため）
+ekam-2026-08.json
+yoga-schedule-backup.json
+*.backup.json
+.DS_Store

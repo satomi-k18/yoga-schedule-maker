@@ -315,10 +315,39 @@ const LEGACY_NAMES = [
   "陰ヨガ","筋膜リリース","マッサージ","RYT200"
 ];
 const KEY = "yogaSchedule.v2";
-const TIMES = (()=>{ const a=[]; for(let h=5;h<=23;h++) for(let m=0;m<60;m+=15)
+// 10分刻みと15分刻みの両方を用意する（00,10,15,20,30,40,45,50）
+const TIME_MINUTES = [0,10,15,20,30,40,45,50];
+const TIMES = (()=>{ const a=[]; for(let h=5;h<=23;h++) for(const m of TIME_MINUTES)
   a.push(String(h).padStart(2,"0")+":"+String(m).padStart(2,"0")); return a; })();
 
 let state = {title:"", year:0, month:0, classes:[]};
+
+/* 選べる時刻は10分刻み。
+   ただし、すでに登録されている時刻（15分刻みで入れたものなど）は必ず残す。
+   これがないと、古いクラスを編集した瞬間に時刻がずれる。 */
+function timeChoices(){
+  const s = new Set(TIMES);
+  (state.classes || []).forEach(c => { if(c.start) s.add(c.start); if(c.end) s.add(c.end); });
+  return [...s].sort();
+}
+function fillTimeSelect(sel){
+  if(!sel) return;
+  const list = timeChoices();
+  if(sel.options.length === list.length) return;      // 変化がなければ触らない
+  const cur = sel.value;
+  sel.innerHTML = "";
+  list.forEach(t => sel.add(new Option(t,t)));
+  if(list.includes(cur)) sel.value = cur;
+}
+// 開始時刻から指定分後の候補を返す（一覧になければ、その次に近いもの）
+function plusMinutes(start, mins, sel){
+  const [h,m] = start.split(":").map(Number);
+  const t = h*60 + m + mins;
+  const want = String(Math.floor(t/60)).padStart(2,"0")+":"+String(t%60).padStart(2,"0");
+  const list = [...sel.options].map(o => o.value);
+  if(list.includes(want)) return want;
+  return list.find(v => v > start) || list[list.length-1];
+}
 const $ = id => document.getElementById(id);
 const iso = dt => dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0")+"-"+String(dt.getDate()).padStart(2,"0");
 // 属性値にも埋め込むので、引用符とスラッシュまで確実に潰す
@@ -378,7 +407,7 @@ function init(){
   const now = new Date();
   for(let y=now.getFullYear()-1; y<=now.getFullYear()+2; y++) $("year").add(new Option(y+"年", y));
   for(let m=1; m<=12; m++) $("month").add(new Option(m+"月", m));
-  TIMES.forEach(t => { $("f-start").add(new Option(t,t)); $("f-end").add(new Option(t,t)); });
+  timeChoices().forEach(t => { $("f-start").add(new Option(t,t)); $("f-end").add(new Option(t,t)); });
   $("f-start").value = "10:30";
   $("f-end").value   = "11:30";
 
@@ -422,8 +451,7 @@ function init(){
   };
   $("f-start").onchange = () => {
     if($("f-end").value <= $("f-start").value){
-      const i = TIMES.indexOf($("f-start").value);
-      $("f-end").value = TIMES[Math.min(i+4, TIMES.length-1)];
+      $("f-end").value = plusMinutes($("f-start").value, 60, $("f-end"));
     }
   };
   $("toggleName").onclick = () => {
@@ -598,6 +626,7 @@ function copyWeek(){
 
 /* ---------- 描画 ---------- */
 function redraw(){
+  fillTimeSelect($("f-start")); fillTimeSelect($("f-end"));
   buildNameOptions(); renderNameManageList();
   buildTeacherOptions(); renderTeacherManageList();
   buildColorOptions(); renderCustomList();
@@ -875,7 +904,7 @@ function editClass(i, el){
   repSel.add(new Option("毎週この曜日", "1"));
   repSel.value = c.repeat ? "1" : "0";
   const st = document.createElement("select"), en = document.createElement("select");
-  TIMES.forEach(t => { st.add(new Option(t,t)); en.add(new Option(t,t)); });
+  timeChoices().forEach(t => { st.add(new Option(t,t)); en.add(new Option(t,t)); });
   st.value = c.start; en.value = c.end;
   const nm = document.createElement("textarea");
   nm.rows = 2; nm.value = c.name;

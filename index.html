@@ -746,12 +746,61 @@ function renderTeacherManageList(){
     el.className = "item";
     el.innerHTML = '<span class="nm"></span>';
     el.querySelector(".nm").textContent = n;
+    const edit = document.createElement("button");
+    edit.className = "ghost mini"; edit.textContent = "編集";
+    edit.style.marginLeft = "auto";
+    edit.onclick = () => editTeacherName(i, el);
     const b = document.createElement("button");
     b.className = "ghost mini"; b.textContent = "削除";
-    b.style.marginLeft = "auto";
+    b.style.marginLeft = "6px";
     b.onclick = () => removeTeacherName(i);
-    el.appendChild(b);
+    el.append(edit, b);
     host.appendChild(el);
+  });
+}
+
+/* 登録済みの名前をその場で編集する（改行もそのまま入れられる）
+   スケジュールに入っている同じ名前のクラスも一緒に書き換える */
+function startEdit(el, current, apply){
+  el.innerHTML = "";
+  el.style.alignItems = "flex-start";
+  const ta = document.createElement("textarea");
+  ta.rows = 2; ta.value = current; ta.style.flex = "1"; ta.style.marginRight = "8px";
+  const ok = document.createElement("button");
+  ok.className = "mini"; ok.textContent = "保存";
+  const cancel = document.createElement("button");
+  cancel.className = "ghost mini"; cancel.textContent = "やめる"; cancel.style.marginLeft = "6px";
+  ok.onclick = () => {
+    const v = ta.value.replace(/[ \t]+$/gm, "").trim();
+    if(!v){ alert("名前を入れてください。"); return; }
+    apply(v);
+  };
+  cancel.onclick = () => redraw();
+  el.append(ta, ok, cancel);
+  ta.focus();
+}
+
+function editClassName(i, el){
+  const cur = state.classNames[i];
+  startEdit(el, cur, v => {
+    if(v === cur){ redraw(); return; }
+    state.classNames[i] = v;
+    let n = 0;
+    state.classes.forEach(c => { if(c.name === cur){ c.name = v; n++; } });
+    save(); redraw();
+    if(n) alert("スケジュール上の"+n+"件も、この名前に更新しました。");
+  });
+}
+
+function editTeacherName(i, el){
+  const cur = state.teacherNames[i];
+  startEdit(el, cur, v => {
+    if(v === cur){ redraw(); return; }
+    state.teacherNames[i] = v;
+    let n = 0;
+    state.classes.forEach(c => { if(c.teacher === cur){ c.teacher = v; n++; } });
+    save(); redraw();
+    if(n) alert("スケジュール上の"+n+"件も、この講師名に更新しました。");
   });
 }
 
@@ -767,12 +816,16 @@ function renderNameManageList(){
     const el = document.createElement("div");
     el.className = "item";
     el.innerHTML = '<span class="nm"></span>';
-    el.querySelector(".nm").textContent = n;
+    el.querySelector(".nm").innerHTML = nameParts(n).map(esc).join("<br>");   // 改行も見えるように
+    const edit = document.createElement("button");
+    edit.className = "ghost mini"; edit.textContent = "編集";
+    edit.style.marginLeft = "auto";
+    edit.onclick = () => editClassName(i, el);
     const b = document.createElement("button");
     b.className = "ghost mini"; b.textContent = "削除";
-    b.style.marginLeft = "auto";
+    b.style.marginLeft = "6px";
     b.onclick = () => removeClassName(i);
-    el.appendChild(b);
+    el.append(edit, b);
     host.appendChild(el);
   });
 }

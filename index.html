@@ -199,7 +199,8 @@
     <p class="hint">文字色は背景の明るさから自動で決まります。</p>
     <div id="customList" class="list" style="margin-top:10px"></div>
   </div>
-  <p class="hint">毎週ある固定クラスは「毎週この曜日」、週によって違うクラスは「この日だけ」で入れてください。両方まぜて使えます。<br>追加してもクラス名や時間は残ります。<strong>日付だけ変えて「追加」を押していけば、同じクラスを続けて登録できます。</strong></p>
+  <p class="hint">毎週ある固定クラスは「毎週この曜日」、週によって違うクラスは「この日だけ」で入れてください。両方まぜて使えます。<br>追加してもクラス名や時間は残ります。<strong>日付だけ変えて「追加」を押していけば、同じクラスを続けて登録できます。</strong><br>
+  クラス名に <code>|</code> を入れると、そこで改行します（例: <code>アシュタンガ|マインドフルネス</code>）。入れなければ自動で折り返します。</p>
 </section>
 
 <!-- 3 -->
@@ -850,7 +851,7 @@ function chipHTML(c){
   const col = colorOf(c.color);
   return '<div class="chip" style="background:'+col.bg+';color:'+col.ink+'">'+
          '<span class="t">'+c.start+'〜'+c.end+'</span>'+
-         '<b>'+esc(c.name)+'</b>'+
+         '<b>'+nameParts(c.name).map(esc).join('<br>')+'</b>'+
          (c.teacher ? '<span>'+esc(c.teacher)+'</span>' : '')+'</div>';
 }
 
@@ -951,7 +952,7 @@ function renderCalendar(){
           const col = colorOf(c.color);
           html += '<div class="chip" style="background:'+col.bg+';color:'+col.ink+'">'+
                   '<span class="t">'+c.start+'〜'+c.end+'</span>'+
-                  '<b>'+esc(c.name)+'</b>'+
+                  '<b>'+nameParts(c.name).map(esc).join('<br>')+'</b>'+
                   (c.teacher ? '<span>'+esc(c.teacher)+'</span>' : '')+'</div>';
         });
         html += '</td>';
@@ -1093,7 +1094,7 @@ function drawMonthImage(){
       const dt = new Date(start); dt.setDate(start.getDate() - start.getDay() + i);
       const inM = dt.getMonth() === state.month-1;
       dayItems.push(inM ? classesForDate(dt).map(c => {
-        const lines = wrapLines(g, c.name, textW, 2);
+        const lines = nameLines(g, c.name, textW, 3);
         return { c, lines, h: 15 + lines.length*15 };
       }) : []);
     }
@@ -1222,6 +1223,23 @@ function bestBreak(s, n){
     while(i > 1 && NO_START.includes(s[i])) i--;
   }
   return i;
+}
+
+// クラス名に | が入っていたら、そこで必ず改行する
+const nameParts = s => String(s == null ? "" : s).split(/[|｜]/).map(v => v.trim()).filter(v => v.length);
+
+function nameLines(g, name, maxW, maxTotal){
+  const parts = nameParts(name);
+  if(parts.length <= 1) return wrapLines(g, name, maxW, maxTotal);
+  const out = [];
+  parts.forEach((p, i) => {
+    const left = maxTotal - out.length;
+    if(left <= 0) return;
+    // 最後の区切り以外は1行ずつ。最後だけ残りの行数を使う
+    const budget = (i === parts.length - 1) ? left : 1;
+    wrapLines(g, p, maxW, budget).forEach(l => { if(out.length < maxTotal) out.push(l); });
+  });
+  return out;
 }
 
 function wrapLines(g, text, maxW, maxLines){

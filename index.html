@@ -33,11 +33,12 @@
     border-radius:50%; display:grid; place-items:center; font-size:12px; flex:none;
   }
   label{display:block; font-size:12px; color:var(--sub); margin-bottom:4px}
-  input,select,button{font-family:inherit; font-size:14px}
-  input,select{
+  input,select,button,textarea{font-family:inherit; font-size:14px}
+  input,select,textarea{
     width:100%; padding:8px 10px; border:1px solid var(--line);
     border-radius:8px; background:#fff; color:var(--ink);
   }
+  textarea{resize:vertical; line-height:1.5; min-height:44px}
   .grid{display:grid; gap:12px}
   .g-setting{grid-template-columns:2fr 1fr 1fr}
   .g-form{grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); align-items:end}
@@ -152,7 +153,7 @@
     <div><label>開始</label><select id="f-start"></select></div>
     <div><label>終了</label><select id="f-end"></select></div>
     <div><label>クラスを選ぶ</label><select id="f-preset"></select></div>
-    <div><label>クラス名（直接入力もOK）</label><input id="f-name" list="nameList" placeholder="マイソール"><datalist id="nameList"></datalist></div>
+    <div><label>クラス名（改行したい位置でEnter）</label><textarea id="f-name" rows="2" placeholder="マイソール"></textarea><datalist id="nameList"></datalist></div>
     <div><label>講師を選ぶ</label><select id="f-tpreset"></select></div>
     <div><label>講師名（直接入力もOK）</label><input id="f-teacher" list="teacherList" placeholder="Satomi"><datalist id="teacherList"></datalist></div>
     <div><label>色</label><select id="f-color"></select></div>
@@ -200,7 +201,7 @@
     <div id="customList" class="list" style="margin-top:10px"></div>
   </div>
   <p class="hint">毎週ある固定クラスは「毎週この曜日」、週によって違うクラスは「この日だけ」で入れてください。両方まぜて使えます。<br>追加してもクラス名や時間は残ります。<strong>日付だけ変えて「追加」を押していけば、同じクラスを続けて登録できます。</strong><br>
-  クラス名に <code>|</code> を入れると、そこで改行します（例: <code>アシュタンガ|マインドフルネス</code>）。入れなければ自動で折り返します。</p>
+  クラス名は、<strong>改行したい位置でEnterを押す</strong>とそのまま改行されます。何もしなければ自動で折り返します。</p>
 </section>
 
 <!-- 3 -->
@@ -678,10 +679,9 @@ function buildNameOptions(){
   const sel = $("f-preset");
   sel.innerHTML = "";
   sel.add(new Option(names.length ? "選んでください" : "（クラス名を登録してください）", ""));
-  names.forEach(n => sel.add(new Option(n, n)));
+  // 選択肢では改行を空白にして1行で見せる（値は改行を保ったまま）
+  names.forEach(n => sel.add(new Option(n.replace(/[\r\n]+/g, " "), n)));
   sel.value = "";
-
-  $("nameList").innerHTML = names.map(n => '<option value="'+esc(n)+'">').join("");
 }
 
 /* ---------- クラス名の登録 ---------- */
@@ -1226,7 +1226,7 @@ function bestBreak(s, n){
 }
 
 // クラス名に | が入っていたら、そこで必ず改行する
-const nameParts = s => String(s == null ? "" : s).split(/[|｜]/).map(v => v.trim()).filter(v => v.length);
+const nameParts = s => String(s == null ? "" : s).split(/[|｜\r\n]/).map(v => v.trim()).filter(v => v.length);
 
 function nameLines(g, name, maxW, maxTotal){
   const parts = nameParts(name);

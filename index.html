@@ -837,13 +837,84 @@ function itemEl(c, whenLabel){
     '<span class="swatch" style="background:'+colorOf(c.color).bg+'"></span>'+
     '<span class="when"></span><span class="nm"></span><span class="tc"></span>';
   el.querySelector(".when").textContent = whenLabel+" "+c.start+"–"+c.end;
-  el.querySelector(".nm").textContent = c.name;
+  el.querySelector(".nm").innerHTML = nameParts(c.name).map(esc).join("<br>");
   el.querySelector(".tc").textContent = c.teacher;
+  const edit = document.createElement("button");
+  edit.className = "ghost mini"; edit.textContent = "編集";
+  edit.style.marginLeft = "8px";
+  edit.onclick = () => editClass(c._i, el);
   const b = document.createElement("button");
   b.className = "ghost mini"; b.textContent = "削除";
+  b.style.marginLeft = "6px";
   b.onclick = () => removeClass(c._i);
-  el.appendChild(b);
+  el.append(edit, b);
   return el;
+}
+
+/* 登録済みのクラスをその場で直す。
+   カレンダーを見てから「ここで改行したい」となる流れを想定している */
+function editClass(i, el){
+  const c = state.classes[i];
+  el.innerHTML = "";
+  el.style.flexWrap = "wrap";
+  el.style.alignItems = "flex-end";
+
+  const field = (label, node, w) => {
+    const d = document.createElement("div");
+    d.style.minWidth = w || "108px";
+    const l = document.createElement("label"); l.textContent = label;
+    d.append(l, node);
+    return d;
+  };
+  const dateIn = document.createElement("input");
+  dateIn.type = "date";
+  dateIn.value = c.date || iso(new Date(state.year, state.month-1, 1));
+  const repSel = document.createElement("select");
+  repSel.add(new Option("この日だけ", "0"));
+  repSel.add(new Option("毎週この曜日", "1"));
+  repSel.value = c.repeat ? "1" : "0";
+  const st = document.createElement("select"), en = document.createElement("select");
+  TIMES.forEach(t => { st.add(new Option(t,t)); en.add(new Option(t,t)); });
+  st.value = c.start; en.value = c.end;
+  const nm = document.createElement("textarea");
+  nm.rows = 2; nm.value = c.name;
+  const tc = document.createElement("input"); tc.value = c.teacher || "";
+  const col = document.createElement("select");
+  COLORS.forEach((x,ix) => col.add(new Option(x.n, ix)));
+  state.customColors.forEach((x,ix) => col.add(new Option(x.n+"（自作）", CUSTOM_BASE+ix)));
+  col.value = c.color;
+
+  const ok = document.createElement("button");
+  ok.className = "mini"; ok.textContent = "保存"; ok.style.marginRight = "6px";
+  const cancel = document.createElement("button");
+  cancel.className = "ghost mini"; cancel.textContent = "やめる";
+  ok.onclick = () => {
+    const v = nm.value.replace(/[ \t]+$/gm, "").trim();
+    if(!v){ alert("クラス名を入れてください。"); return; }
+    if(en.value <= st.value){ alert("終了時刻が開始時刻より前になっています。"); return; }
+    if(!dateIn.value){ alert("日付を選んでください。"); return; }
+    const dt = new Date(dateIn.value + "T00:00:00");
+    const repeat = repSel.value === "1";
+    state.classes[i] = {
+      repeat, day: dt.getDay(), date: repeat ? null : dateIn.value,
+      start: st.value, end: en.value, name: v,
+      teacher: tc.value.trim(), color: +col.value
+    };
+    save(); redraw();
+  };
+  cancel.onclick = () => redraw();
+
+  el.append(
+    field("日付", dateIn), field("くり返し", repSel),
+    field("開始", st, "92px"), field("終了", en, "92px"),
+    field("クラス名（Enterで改行）", nm, "190px"),
+    field("講師", tc), field("色", col, "120px")
+  );
+  const btns = document.createElement("div");
+  btns.style.marginLeft = "auto";
+  btns.append(ok, cancel);
+  el.append(btns);
+  nm.focus();
 }
 
 function renderList(){

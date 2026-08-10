@@ -315,9 +315,8 @@ const LEGACY_NAMES = [
   "陰ヨガ","筋膜リリース","マッサージ","RYT200"
 ];
 const KEY = "yogaSchedule.v2";
-// 10分刻みと15分刻みの両方を用意する（00,10,15,20,30,40,45,50）
-const TIME_MINUTES = [0,10,15,20,30,40,45,50];
-const TIMES = (()=>{ const a=[]; for(let h=5;h<=23;h++) for(const m of TIME_MINUTES)
+// 5分刻み（00,05,10,…,55）。10分刻みも15分刻みもこの中に含まれる
+const TIMES = (()=>{ const a=[]; for(let h=5;h<=23;h++) for(let m=0;m<60;m+=5)
   a.push(String(h).padStart(2,"0")+":"+String(m).padStart(2,"0")); return a; })();
 
 let state = {title:"", year:0, month:0, classes:[]};

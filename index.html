@@ -104,10 +104,15 @@
     .cal{font-size:10px}
     .cal .tcol{width:48px}
   }
+  .print-only{display:none}
   @media print{
     .panel:not(#printArea), header{display:none}
     #printArea{border:0; padding:0}
     .row{display:none}
+    #printArea h2{display:none}          /* 「4 月間スケジュール」は印刷しない */
+    .print-only{display:block; margin:0 0 10px}
+    .print-only .pt{font-size:16px; font-weight:700}
+    .print-only .pm{font-size:12px; color:var(--sub); margin-top:2px}
   }
 </style>
 </head>
@@ -234,6 +239,7 @@
       </select>
     </div>
   </div>
+  <div class="print-only" id="printHead"></div>
   <div id="calHost"></div>
   <div class="row" style="margin-top:12px">
     <button class="ghost mini" id="printBtn">印刷 / PDFで保存</button>
@@ -456,6 +462,12 @@ function init(){
   $("f-preset").onchange = () => {
     if($("f-preset").value){ $("f-name").value = $("f-preset").value; $("f-preset").value = ""; }
   };
+  // 印刷中だけ、ブラウザが上部に出すページ名をスケジュールの名前に差し替える
+  const origTitle = document.title;
+  window.addEventListener("beforeprint", () => {
+    document.title = (state.title || "スケジュール") + " " + state.year + "年" + state.month + "月";
+  });
+  window.addEventListener("afterprint", () => { document.title = origTitle; });
   $("printBtn").onclick = () => window.print();
   $("add").onclick = addClass;
   $("copyWeek").onclick = copyWeek;
@@ -821,6 +833,15 @@ function slotLabel(key){
   return slotUnitNow() === 60 ? Number(key.slice(0,2)) + "時台" : key;
 }
 
+// 印刷したときだけ出る見出し（画面には表示しない）
+function updatePrintHead(){
+  const h = $("printHead");
+  if(!h) return;
+  h.innerHTML = '<div class="pt"></div><div class="pm"></div>';
+  h.querySelector(".pt").textContent = state.title || "";
+  h.querySelector(".pm").textContent = state.year + "年" + state.month + "月 スケジュール";
+}
+
 const hourKey = t => t.slice(0,2)+":00";
 // 午前 / 午後 / 夜 の3ゾーン
 const zoneOf = t => t < "12:00" ? 0 : t < "17:00" ? 1 : 2;
@@ -886,7 +907,7 @@ function renderCalendarGrid(){
     html += '</tr>';
   });
   html += '</tbody></table>';
-  $("calHost").innerHTML = html;
+  $("calHost").innerHTML = html; updatePrintHead();
 }
 
 /* 月間ビュー：1ヶ月をひと続きの表に。曜日の列は固定、時間帯の行で横に揃う */
@@ -940,7 +961,7 @@ function renderCalendar(){
   });
 
   html += '</tbody></table>';
-  $("calHost").innerHTML = html;
+  $("calHost").innerHTML = html; updatePrintHead();
 }
 
 /* ---------- 新月・満月（Meeus の朔望計算・日本時間） ---------- */

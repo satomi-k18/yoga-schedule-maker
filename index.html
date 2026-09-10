@@ -10,7 +10,7 @@
 <title>ヨガスケジュールメーカー</title>
 <style>
   :root{
-    --bg:#faf8f5; --card:#fff; --ink:#2e2a26; --sub:#7a726a;
+    --bg:#fff7fa; --card:#fff; --ink:#432f40; --sub:#705b6b;
     --line:#e6e0d8; --accent:#7b8f6b; --accent-ink:#fff;
     --sun:#c0554d; --sat:#4d6fa8; --radius:14px;
   }
@@ -70,19 +70,19 @@
   .wk-label{font-size:12px; color:var(--sub); margin-bottom:6px; font-weight:600}
   .cal{width:100%; border-collapse:collapse; table-layout:fixed}
   .cal th,.cal td{border:1px solid var(--line); padding:4px; font-size:11px}
-  .cal thead th{background:#f2ede6; font-weight:600; font-size:12px; padding:6px 2px}
+  .cal thead th{background:var(--soft); font-weight:600; font-size:12px; padding:6px 2px}
   .cal .tcol{
-    width:62px; background:#f7f3ee; color:var(--sub); text-align:center;
+    width:62px; background:var(--bg); color:var(--sub); text-align:center;
     vertical-align:middle; font-variant-numeric:tabular-nums; font-weight:600;
   }
   .cal td{vertical-align:top; height:52px}
   .cal .sun{color:var(--sun)} .cal .sat{color:var(--sat)}
-  .cal .out{background:#faf8f5}
+  .cal .out{background:var(--bg)}
   .cal .drow td{
-    background:#f7f3ee; font-weight:700; font-size:12px; text-align:center;
-    padding:3px; border-top:2px solid #d8d0c6;
+    background:var(--bg); font-weight:700; font-size:12px; text-align:center;
+    padding:3px; border-top:2px solid var(--rule);
   }
-  .cal .drow td.out{background:#faf8f5}
+  .cal .drow td.out{background:var(--bg)}
   .cal .none{color:#b8b0a6; text-align:center}
   .grid-cal td{height:auto; min-height:88px; vertical-align:top}
   .grid-cal .dnum{font-weight:700; font-size:12px; margin-bottom:3px}
@@ -135,6 +135,62 @@
     .print-only .pt{font-size:16px; font-weight:700}
     .print-only .pm{font-size:12px; color:var(--sub); margin-top:2px}
   }
+
+/* 2026-09: compact workspace */
+:root{--bg:#fff7fa;--ink:#432f40;--sub:#705b6b;--accent:#974e73;--line:#eadce4}
+body{font-size:16px} .wrap{max-width:1180px;padding-top:24px}
+header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px}
+header h1{font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-size:24px;font-weight:600;margin:0}
+header p{margin:4px 0 0;font-size:12px}.brand-note{color:var(--sub);font-size:12px}
+button{min-height:44px}button.mini{min-height:44px;font-size:13px}
+button{transition:opacity 120ms,transform 120ms}button:active{transform:translateY(1px)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+input,select,textarea{border-color:var(--input-line);font-size:16px;min-height:44px;min-width:0}
+input[type=checkbox]{min-height:20px;width:20px;height:20px;accent-color:var(--accent)}
+.panel{border:0;padding:24px;border-radius:12px;margin-bottom:16px;min-width:0}
+.panel h2{font-size:18px;line-height:1.5}.num{display:none!important}
+.tabs{display:flex;border-bottom:1px solid var(--line);gap:8px;margin-bottom:24px;position:sticky;top:0;background:var(--bg);z-index:3;padding-top:8px}
+.tabs button{color:var(--sub);background:transparent;border-radius:0;padding:12px 20px;border-bottom:3px solid transparent}
+.tabs button[aria-selected=true]{color:var(--accent);border-bottom-color:var(--accent);font-weight:700}
+[hidden]{display:none!important}.workspace{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:20px;align-items:start}
+.g-form{grid-template-columns:1fr 1fr;gap:12px}.field-wide{grid-column:1/-1}
+.g-form>div:last-child{grid-column:1/-1}.g-form #add{width:100%}
+#nameBox,#colorBox{border:0!important;padding:0!important}.hint{color:var(--sub)}
+#editorPanel>.hint{display:none}#editorPanel .row{margin-top:16px!important}
+#list .item{border:0;border-bottom:1px solid var(--line);border-radius:0;padding:12px 0;gap:8px;flex-wrap:wrap}
+#list .when{font-size:13px}#list .nm{overflow-wrap:anywhere}.empty{padding:24px 0;line-height:1.8}
+.filters{display:flex;gap:8px;margin-bottom:16px}.filters>*{min-width:0;flex:1}
+summary{cursor:pointer;color:var(--sub);padding:12px 0;min-height:44px;font-size:14px}
+.settings{margin-bottom:16px}.settings .g-setting{padding:12px 0}.tools{margin-top:16px;border-top:1px solid var(--line)}
+.post-layout{display:grid;grid-template-columns:320px minmax(0,1fr);gap:32px;align-items:start}
+.post-controls>.row{display:grid;gap:16px}.post-controls>.row>div{min-width:0!important}
+.preview-stage{background:var(--stage);border-radius:8px;padding:24px;display:flex;align-items:center;justify-content:center;min-height:400px}
+#cvImg{max-height:560px;max-width:100%;width:auto;box-shadow:0 4px 20px var(--ink)14;border:0;border-radius:0}
+#dayControls{display:grid;gap:12px}.quickdays{display:flex;gap:8px}.quickdays button{flex:1}
+#storyStatus{font-size:13px;line-height:1.7;color:var(--sub);margin:0}
+#storyPage{margin-bottom:4px}.story-options{border-top:1px solid var(--line)}.story-options>div{margin-bottom:12px}#download{width:100%}#storyNote{min-height:72px}
+.month-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px}
+#monthCaption{font-size:20px;font-family:Georgia,"Hiragino Mincho ProN",serif}
+.grid-cal.aligned .chip{height:auto;min-height:58px;overflow:visible}.grid-cal .rest{color:var(--sub)}
+#calHost{overflow-x:auto}#calHost table{min-width:660px}
+@media(max-width:760px){.workspace,.post-layout{grid-template-columns:1fr;gap:0}.wrap{padding:16px 12px 32px}.panel{padding:16px}header h1{font-size:20px}.brand-note{display:none}.tabs{gap:0;margin-bottom:16px}.tabs button{flex:1;padding:12px 4px;font-size:14px}.g-setting{grid-template-columns:1fr 1fr}.g-setting>div:first-child{grid-column:1/-1}.g-form{grid-template-columns:1fr 1fr}.row>div{min-width:0}.post-controls>.row{grid-template-columns:1fr 1fr}.post-controls>.row>div:first-child,.post-controls>.row>#dayControls,.post-controls>.row>#download{grid-column:1/-1}.preview-stage{padding:16px;margin-top:16px;min-height:0}#cvImg{max-height:460px}.post-controls .hint{font-size:12px}.settings{margin-bottom:8px}.month-heading{align-items:start}.month-heading button{font-size:13px;padding:8px}.filters{flex-wrap:wrap}.filters select,.filters input{flex-basis:100%;width:100%}}
+@media(prefers-reduced-motion:reduce){button{transition:none}}
+@media print{header,.tabs,.settings,.month-heading{display:none!important}#calendarTab{display:block!important}#registerTab,#postTab{display:none!important}#printArea{display:block!important}.wrap{max-width:none;padding:0}#calHost{overflow:visible}#calHost table{min-width:0}}
+
+
+.theme-picker{margin:0 0 12px;scroll-margin-top:64px}.color-help{margin-bottom:16px}.color-help button{margin-top:12px;white-space:normal;text-align:left}.theme-picker summary{flex-wrap:wrap}.theme-picker summary{display:flex;align-items:center;gap:8px;width:fit-content;color:var(--ink)}
+.theme-dot{width:16px;height:16px;border-radius:50%;background:var(--accent);display:inline-block}
+.theme-options{border:0;padding:8px 0 16px;margin:0;display:flex;flex-wrap:wrap;gap:8px}
+.theme-options legend{font-size:13px;color:var(--sub);padding:0 0 8px}
+.theme-choice{display:flex;gap:8px;align-items:center;padding:10px 12px;margin:0;border:1px solid var(--line);border-radius:8px;cursor:pointer;color:var(--ink);background:var(--card);min-height:44px;font-size:14px}
+.theme-choice:has(input:checked){border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.theme-choice input{width:16px;min-height:16px;height:16px;accent-color:var(--accent);margin:0}
+.theme-sample{width:24px;height:24px;border-radius:50%;border:1px solid #00000018}
+@media print{.theme-picker{display:none!important}}
+
+.free-colors{max-width:620px;padding:12px 0}.free-color-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:16px 0}.free-color-fields input{width:100%;height:48px;padding:4px;background:#fff}.free-color-fields label{min-width:0}button:disabled{opacity:.5;cursor:not-allowed}
+@media(max-width:500px){.free-color-fields{grid-template-columns:1fr}.free-color-fields label{display:grid;grid-template-columns:1fr 100px;align-items:center;gap:8px}}
+input,select,textarea{background:var(--bg);color:var(--ink)}.cal thead th{color:var(--soft-ink)}
 </style>
 </head>
 <body>
@@ -143,7 +199,7 @@
 <header>
   <h1>ヨガスケジュールメーカー</h1>
   <p>日付ごとにクラスを入れると、月間表とInstagram用画像が出ます。データはこの端末に保存されます。
-  <span style="color:var(--sub); font-size:11px; margin-left:6px">version 2026-08-10</span></p>
+  <span style="color:var(--sub); font-size:11px; margin-left:6px">version 2026-09-09</span></p>
 </header>
 
 <!-- 1 -->
@@ -183,7 +239,7 @@
 
   <div class="row" style="margin-top:10px">
     <button class="ghost mini" id="toggleName">クラス名・講師名を登録する</button>
-    <button class="ghost mini" id="toggleColor">色を自分で追加する</button>
+    <button class="ghost mini" id="toggleColor">クラスの色を追加する</button>
   </div>
 
   <div id="nameBox" style="display:none; margin-top:10px; padding:12px; border:1px solid var(--line); border-radius:10px">
@@ -211,12 +267,12 @@
   <div id="colorBox" style="display:none; margin-top:10px; padding:12px; border:1px solid var(--line); border-radius:10px">
     <div class="row" style="align-items:flex-end">
       <div style="flex:1; min-width:150px">
-        <label>色の名前</label><input id="c-name" placeholder="スタジオカラー">
+        <label>色の名前</label><input id="c-name" placeholder="例：朝ヨガ用のベージュ">
       </div>
       <div style="width:110px">
-        <label>背景色</label><input type="color" id="c-bg" value="#cfe3d8" style="height:38px; padding:3px">
+        <label>クラス枠の色</label><input type="color" id="c-bg" value="#cfe3d8" style="height:38px; padding:3px">
       </div>
-      <button id="c-add">この色を追加</button>
+      <button id="c-add">クラス用の色を登録</button>
     </div>
     <p class="hint">文字色は背景の明るさから自動で決まります。</p>
     <div id="customList" class="list" style="margin-top:10px"></div>
@@ -394,11 +450,13 @@ function sanitizeState(d){
   const now = new Date();
   return {
     title: sStr(d.title, 60),
+    theme: d.theme === "custom" || Object.hasOwn(THEMES,d.theme) ? d.theme : "beige",
+    studioColors: {bg:safeColor(d.studioColors?.bg,"#faf8f5"),accent:safeColor(d.studioColors?.accent,"#85634f"),soft:safeColor(d.studioColors?.soft,"#f0e5d6")},
     year:  sNum(d.year, 1970, 2999, now.getFullYear()),
     month: sNum(d.month, 1, 12, now.getMonth()+1),
     viewMode:  ["calendar","60","30","0"].includes(String(d.viewMode)) ? String(d.viewMode) : "calendar",
     alignMode: ["zone","hour","none"].includes(d.alignMode) ? d.alignMode : "zone",
-    igMode:    d.igMode === "week" ? "week" : "month",
+    igMode:    ["day","week","month"].includes(d.igMode) ? d.igMode : "month",
     igSize:    [1080,1350,1920].includes(Number(d.igSize)) ? Number(d.igSize) : 1350,
     customColors: (Array.isArray(d.customColors) ? d.customColors : []).slice(0,50).map(c => ({
       n:  sStr(c && c.n, 30) || "色",
@@ -495,7 +553,7 @@ function init(){
   $("viewMode").onchange = () => {
     state.viewMode = $("viewMode").value; save(); renderCalendar();
   };
-  if(!state.alignMode) state.alignMode = state.alignTime ? "hour" : "zone";
+  if(!state.alignMode) state.alignMode = state.alignTime ? "hour" : "none";
   $("alignMode").value = state.alignMode;
   $("alignMode").onchange = () => {
     state.alignMode = $("alignMode").value; save(); redraw();
@@ -503,7 +561,7 @@ function init(){
   if(!state.igSize) state.igSize = 1350;
   $("igSize").value = state.igSize;
   $("igSize").onchange = () => { state.igSize = +$("igSize").value; save(); drawCanvas(); };
-  if(!state.igMode) state.igMode = "month";
+  if(!state.igMode) state.igMode = "day";
   $("igMode").value = state.igMode;
   $("igMode").onchange = () => {
     state.igMode = $("igMode").value; save();
@@ -647,16 +705,19 @@ function copyWeek(){
 
 /* ---------- 描画 ---------- */
 function redraw(){
+  applyTheme();
   fillTimeSelect($("f-start")); fillTimeSelect($("f-end"));
   buildNameOptions(); renderNameManageList();
   buildTeacherOptions(); renderTeacherManageList();
   buildColorOptions(); renderCustomList();
   renderList(); renderCalendar(); buildWeekOptions(); drawCanvas();
+  if($("monthCaption")) $("monthCaption").textContent = state.year+"年 "+state.month+"月";
 }
 
 /* ---------- 色 ---------- */
 // 番号から色を引く。100番以降は自作の色。消された色を指していても落ちないようにする
 function colorOf(i){
+
   const c = (i >= CUSTOM_BASE ? state.customColors[i - CUSTOM_BASE] : COLORS[i]) || COLORS[5];
   return { n: c.n, bg: safeColor(c.bg, COLORS[5].bg), ink: safeColor(c.ink, COLORS[5].ink) };
 }
@@ -968,7 +1029,7 @@ function editClass(i, el){
   nm.focus();
 }
 
-function renderList(){
+function renderFullList(){
   const host = $("list");
   host.innerHTML = "";
   const all = state.classes.map((c,i) => ({...c, _i:i}));
@@ -1212,8 +1273,9 @@ const FONT = '"Hiragino Sans","Noto Sans JP",sans-serif';
 function drawCanvas(){
   const cv = $("cv");
   cv.width = 1080;
-  cv.height = +(state.igSize || 1350);
-  if(state.igMode === "week") drawWeekImage(); else drawMonthImage();
+  cv.height = state.igMode === "day" ? 1920 : +(state.igSize || 1350);
+  syncPostControls();
+  if(state.igMode === "day") drawDayImage(); else if(state.igMode === "week") drawWeekImage(); else drawMonthImage();
   // 長押しで保存できるように、描いた結果を画像として置く
   const img = $("cvImg");
   if(img) img.src = cv.toDataURL("image/png");
@@ -1223,13 +1285,13 @@ function drawCanvas(){
 function drawMonthImage(){
   const cv = $("cv"), g = cv.getContext("2d");
   const W = cv.width, H = cv.height, P = 30;
-  g.fillStyle = "#faf8f5"; g.fillRect(0,0,W,H);
+  g.fillStyle = currentTheme().bg; g.fillRect(0,0,W,H);
   g.textBaseline = "top";
 
   // 見出し
-  g.fillStyle = "#2e2a26"; g.font = "bold 40px " + FONT;
+  g.fillStyle = currentTheme().ink; g.font = "bold 40px " + FONT;
   g.fillText(state.title || "ヨガクラス スケジュール", P, 26);
-  g.fillStyle = "#7a726a"; g.font = "26px " + FONT;
+  g.fillStyle = currentTheme().sub; g.font = "26px " + FONT;
   g.fillText(state.year + "年" + state.month + "月", P, 74);
 
   const moons = moonMap(state.year, state.month);
@@ -1242,7 +1304,7 @@ function drawMonthImage(){
   // 曜日の見出し
   DAYS.forEach((d,i) => {
     const x = P + i*colW;
-    g.fillStyle = i===0 ? "#c0554d" : i===6 ? "#4d6fa8" : "#6b645c";
+    g.fillStyle = i===0 ? "#c0554d" : i===6 ? "#4d6fa8" : currentTheme().sub;
     g.font = "bold 22px " + FONT;
     const w = g.measureText(d).width;
     g.fillText(d, x + (colW-w)/2, top + 4);
@@ -1300,25 +1362,25 @@ function drawMonthImage(){
       const x = P + i*colW, y = gridTop + wi*rowH;
       const inMonth = dt.getMonth() === state.month-1 && dt.getDate() >= 1 && dt.getDate() <= lastDay;
 
-      g.strokeStyle = "#e4ddd4"; g.lineWidth = 1;
+      g.strokeStyle = currentTheme().line; g.lineWidth = 1;
       g.strokeRect(x, y, colW, rowH);
-      if(!inMonth){ g.fillStyle = "#f3efe9"; g.fillRect(x+1, y+1, colW-2, rowH-2); continue; }
+      if(!inMonth){ g.fillStyle = currentTheme().bg; g.fillRect(x+1, y+1, colW-2, rowH-2); continue; }
 
-      g.fillStyle = dt.getDay()===0 ? "#c0554d" : dt.getDay()===6 ? "#4d6fa8" : "#2e2a26";
+      g.fillStyle = dt.getDay()===0 ? "#c0554d" : dt.getDay()===6 ? "#4d6fa8" : currentTheme().ink;
       g.font = "bold 20px " + FONT;
       g.fillText(dt.getDate(), x+7, y+5);
 
       const moon = moons[iso(dt)];
       if(moon){
         g.font = "13px " + FONT;
-        g.fillStyle = "#7a726a";
+        g.fillStyle = currentTheme().sub;
         const mk = (moon === "新月" ? "🌑" : "🌕") + moon;
         g.fillText(mk, x + colW - 8 - g.measureText(mk).width, y+8);
       }
 
       const items = dayItems[i];
       if(!items.length){
-        g.fillStyle = "#b0a89f"; g.font = "15px " + FONT;
+        g.fillStyle = currentTheme().sub; g.font = "15px " + FONT;
         g.fillText("休み", x+8, y+32);
         continue;
       }
@@ -1347,7 +1409,7 @@ function drawMonthImage(){
           cy += it.h; shown++;
         }
         if(shown < items.length){
-          g.fillStyle = "#8a8078"; g.font = "12px " + FONT;
+          g.fillStyle = currentTheme().sub; g.font = "12px " + FONT;
           g.fillText("ほか"+(items.length-shown)+"件", x+8, cy+4);
         }
       }
@@ -1443,18 +1505,18 @@ function drawWeekImage(){
   const cv = $("cv"), g = cv.getContext("2d");
   const W = cv.width, H = cv.height, P = 56;
 
-  g.fillStyle = "#faf8f5"; g.fillRect(0,0,W,H);
+  g.fillStyle = currentTheme().bg; g.fillRect(0,0,W,H);
 
   const starts = weekStarts();
   const start = starts[+($("weekSel").value || 0)] || new Date(state.year, state.month-1, 1);
   const end = weekEnd(start);
 
   g.textBaseline = "top";
-  g.fillStyle = "#2e2a26"; g.font = "bold 46px " + FONT;
+  g.fillStyle = currentTheme().ink; g.font = "bold 46px " + FONT;
   g.fillText(state.title || "ヨガクラス スケジュール", P, P);
-  g.fillStyle = "#7a726a"; g.font = "30px " + FONT;
+  g.fillStyle = currentTheme().sub; g.font = "30px " + FONT;
   g.fillText((start.getMonth()+1)+"月"+start.getDate()+"日 〜 "+(end.getMonth()+1)+"月"+end.getDate()+"日", P, P+62);
-  g.strokeStyle = "#e0d9d0"; g.lineWidth = 2;
+  g.strokeStyle = currentTheme().line; g.lineWidth = 2;
   g.beginPath(); g.moveTo(P, P+118); g.lineTo(W-P, P+118); g.stroke();
 
   const days = [];
@@ -1472,13 +1534,13 @@ function drawWeekImage(){
   let y = top;
   days.forEach(d => {
     const dow = d.dt.getDay();
-    g.fillStyle = dow===0 ? "#c0554d" : dow===6 ? "#4d6fa8" : "#2e2a26";
+    g.fillStyle = dow===0 ? "#c0554d" : dow===6 ? "#4d6fa8" : currentTheme().ink;
     g.font = "bold 30px " + FONT;
     g.fillText(d.dt.getDate()+"日（"+DAYS[dow]+"）", P, y+6);
     y += headH;
 
     if(!d.list.length){
-      g.fillStyle = "#b8b0a6"; g.font = "26px " + FONT;
+      g.fillStyle = currentTheme().sub; g.font = "26px " + FONT;
       g.fillText("お休み", P+18, y+4);
       y += lineH + gapY; return;
     }
@@ -1522,7 +1584,7 @@ function roundRect(g,x,y,w,h,r){
 async function downloadPNG(){
   const cv = $("cv");
   const base = "schedule_"+state.year+"-"+String(state.month).padStart(2,"0");
-  const name = (state.igMode === "week" ? base+"_w"+(+$("weekSel").value+1) : base) + ".png";
+  const name = (state.igMode === "day" ? "yoga_"+$("storyDate").value+"_"+(+$("storyPage").value+1) : state.igMode === "week" ? base+"_w"+(+$("weekSel").value+1) : base) + ".png";
 
   const blob = await new Promise(res => cv.toBlob(res, "image/png"));
   if(!blob){ alert("画像を作れませんでした。"); return; }
@@ -1567,7 +1629,182 @@ function importJSON(e){
   e.target.value = "";
 }
 
+
+/* Daily export and compact workspace. Existing storage and class logic are retained. */
+function setupWorkspace(){
+  const panels=[...document.querySelectorAll('.wrap > section')];
+  const [settings,editor,list,calendar,post]=panels;
+  const header=document.querySelector('header');
+  header.innerHTML='<div><h1>ヨガスケジュールメーカー</h1><p>クラスを整えて、明日の一枚を。</p></div><span class="brand-note">データはこのブラウザに保存</span>';
+  const nav=document.createElement('nav'); nav.className='tabs';nav.setAttribute('role','tablist');nav.setAttribute('aria-label','作業を切り替える');
+  nav.innerHTML=['登録・編集','月間スケジュール','投稿画像'].map((n,i)=>'<button role="tab" id="tab'+i+'" aria-controls="'+['registerTab','calendarTab','postTab'][i]+'" aria-selected="'+(i===0)+'" tabindex="'+(i===0?0:-1)+'">'+n+'</button>').join('');
+  header.after(nav);
+  setupThemePicker(header);
+  const settingsBox=document.createElement('details');settingsBox.className='settings';settingsBox.innerHTML='<summary>教室名・年月の設定</summary>';settings.querySelector('h2').remove();settingsBox.append(settings);nav.after(settingsBox);
+  const tabIds=['registerTab','calendarTab','postTab'];
+  tabIds.forEach((id,i)=>{const el=document.createElement('div');el.id=id;el.setAttribute('role','tabpanel');el.setAttribute('aria-labelledby','tab'+i);el.hidden=i!==0;document.querySelector('.wrap').append(el);});
+  $('registerTab').className='workspace';$('registerTab').append(editor,list);$('calendarTab').append(calendar);$('postTab').append(post);
+  editor.id='editorPanel';list.id='listPanel';post.id='postPanel';
+  nav.querySelectorAll('button').forEach((b,i)=>{b.onclick=()=>switchTab(i);b.onkeydown=e=>{let n;if(e.key==='ArrowRight')n=(i+1)%3;if(e.key==='ArrowLeft')n=(i+2)%3;if(e.key==='Home')n=0;if(e.key==='End')n=2;if(n!==undefined){e.preventDefault();switchTab(n);$('tab'+n).focus();}};});
+  $('title').maxLength=60;
+  const colorHelp=document.createElement('div');colorHelp.className='color-help';
+  colorHelp.innerHTML='<p class="hint">ここではクラス枠に使う色を登録します。登録後、フォームの「クラス枠の色」で選んでクラスを追加すると反映されます。</p><button type="button" class="ghost" id="openThemePicker">画面全体・投稿画像の配色を変える</button>';
+  $('colorBox').prepend(colorHelp);
+  $('openThemePicker').onclick=()=>{const box=$('themePicker');box.open=true;box.scrollIntoView({block:'start'});box.querySelector('input:checked').focus({preventScroll:true});};
+  $('f-color').previousElementSibling.textContent='クラス枠の色';
+
+  ['f-name','f-preset','f-teacher'].forEach(id=>$(id).parentElement.classList.add('field-wide'));
+  $('f-tpreset').parentElement.hidden=true;
+  $('f-teacher').previousElementSibling.textContent='講師名（候補から選択・直接入力）';
+  $('f-name').previousElementSibling.textContent='クラス名';
+  $('f-name').maxLength=60;$('f-teacher').maxLength=40;
+  $('f-preset').previousElementSibling.textContent='登録したクラスから入力';
+  const filters=document.createElement('div');filters.className='filters';filters.innerHTML='<select id="listScope" aria-label="クラス一覧の表示範囲"><option value="date">選んだ日のクラス</option><option value="all">すべての登録</option></select><input type="date" id="listDate" aria-label="クラスを確認する日">';list.querySelector('h2').after(filters);
+  $('listDate').value=iso(new Date());$('listDate').onchange=renderList;$('listScope').onchange=()=>{$('listDate').hidden=$('listScope').value==='all';renderList();};
+  $('f-date').addEventListener('change',()=>{$('listDate').value=$('f-date').value;renderList();});
+  const add=$('add'); add.addEventListener('click',()=>{$('listDate').value=$('f-date').value;$('listScope').value='date';$('listDate').hidden=false;renderList();});
+  const details=document.createElement('details');details.className='tools';details.innerHTML='<summary>週のコピー・バックアップ・元に戻す</summary>';details.append(list.querySelector('.row'),list.querySelector('.hint'));list.append(details);
+  const monthHead=document.createElement('div');monthHead.className='month-heading';monthHead.innerHTML='<strong id="monthCaption"></strong><button class="ghost" id="goStory">明日の画像を作る</button>';calendar.prepend(monthHead);const themeJump=document.createElement('button');themeJump.className='ghost';themeJump.textContent='カレンダーの色を変える';themeJump.onclick=()=>{$('themePicker').open=true;$('themePicker').scrollIntoView({block:'start'});$('studioBg').focus({preventScroll:true});};calendar.querySelector('h2').after(themeJump);$('goStory').onclick=()=>{switchTab(2);setStoryDay(1);};
+  $('alignMode').querySelector('[value="none"]').textContent='コンパクト（上から詰める）';
+  $('igMode').add(new Option('1日分のストーリー','day'),0);
+  const layout=document.createElement('div');layout.className='post-layout';const controls=document.createElement('div');controls.className='post-controls';const stage=document.createElement('div');stage.className='preview-stage';
+  controls.append(post.querySelector('.row'));stage.append($('cvImg'));layout.append(controls,stage);post.append(layout);const help=document.createElement('details');help.innerHTML='<summary>画像の保存方法</summary>';help.append(post.querySelector('.hint'));controls.append(help);
+  const day=document.createElement('div');day.id='dayControls';day.innerHTML='<div class="quickdays"><button class="ghost" id="storyToday">今日</button><button class="ghost" id="storyTomorrow">明日</button></div><div><label for="storyDate">告知する日</label><input type="date" id="storyDate"></div><p id="storyStatus" role="status"></p><div><label for="storyClass">掲載するクラス</label><select id="storyClass"><option value="all">この日の全クラス</option></select></div><div><label for="storyHeading">見出し</label><select id="storyHeading"><option value="auto">今日・明日を自動表示</option><option value="date">日付だけ</option></select></div><div><label for="storyNote">ひとこと（任意・60文字まで）</label><textarea id="storyNote" rows="2" maxlength="60" placeholder="初めての方もお気軽に"></textarea></div><div id="storyPageWrap"><label for="storyPage">保存するページ</label><select id="storyPage"></select></div>';
+  $('download').before(day);
+  const more=document.createElement('details');more.className='story-options';more.innerHTML='<summary>ひとこと・掲載クラスを変更</summary>';
+  ['storyClass','storyHeading','storyNote'].forEach(id=>more.append($(id).parentElement));day.insertBefore(more,$('storyPageWrap'));
+  more.insertAdjacentHTML('beforeend','<p class="hint">画像の下部に、Instagramで予約リンクのスタンプを置けます。</p>');
+
+  $('storyDate').value=iso(tomorrow());
+  ['storyDate','storyClass','storyHeading','storyPage'].forEach(id=>$(id).onchange=()=>{if(id==='storyDate')$('storyClass').value='all';drawCanvas();});
+  $('storyNote').oninput=drawCanvas;$('storyToday').onclick=()=>setStoryDay(0);$('storyTomorrow').onclick=()=>setStoryDay(1);
+  document.querySelectorAll('label:not([for])').forEach(l=>{const el=l.parentElement.querySelector('input,select,textarea');if(el?.id)l.htmlFor=el.id;});
+}
+function switchTab(i){
+  ['registerTab','calendarTab','postTab'].forEach((id,j)=>{$(id).hidden=i!==j;$('tab'+j).setAttribute('aria-selected',String(i===j));$('tab'+j).tabIndex=i===j?0:-1;});
+  if(i===2)drawCanvas();
+}
+function tomorrow(){const d=new Date();d.setDate(d.getDate()+1);return d;}
+function setStoryDay(offset){const d=new Date();d.setDate(d.getDate()+offset);$('storyDate').value=iso(d);$('storyClass').value='all';state.igMode='day';$('igMode').value='day';save();drawCanvas();}
+function validStoryDate(){const value=$('storyDate').value;const d=new Date(value+'T00:00:00');return !isNaN(d)&&iso(d)===value?d:null;}
+function syncPostControls(){
+  if(!$('dayControls'))return;
+  const day=state.igMode==='day';$('dayControls').hidden=!day;$('igSize').parentElement.hidden=day;$('weekWrap').style.display=state.igMode==='week'?'':'none';
+  $('igMode').value=state.igMode;$('igSize').value=state.igSize||1350;
+  $('download').disabled=false;$('download').textContent='画像を保存';
+  if(!day)return;
+  const d=validStoryDate();const list=d?classesForDate(d):[];const prev=$('storyClass').value;
+  $('storyClass').replaceChildren(new Option('この日の全クラス','all'));
+  list.forEach(c=>$('storyClass').add(new Option(c.start+' '+c.name.replace(/\n/g,' '),String(c._i))));
+  if([...$('storyClass').options].some(o=>o.value===prev))$('storyClass').value=prev;
+  const pages=getDayPages().length;const page=+$('storyPage').value||0;
+  $('storyPage').replaceChildren();for(let i=0;i<pages;i++)$('storyPage').add(new Option((i+1)+' / '+pages+' 枚目',i));$('storyPage').value=String(Math.min(page,pages-1));$('storyPageWrap').hidden=pages===1;
+  $('storyStatus').textContent=!d?'日付を選んでください。':!list.length?'この日の登録はありません。登録・編集で予定を追加してください。':list.length+'クラスを掲載できます。'+(pages>1?pages+'枚に分けて保存。':'');
+  $('download').disabled=!list.length;
+  if(pages>1)$('download').textContent=(+$('storyPage').value+1)+'枚目を保存';
+}
+function renderList(){
+  if(!$('listScope')||$('listScope').value==='all'){renderFullList();return;}
+  const d=new Date($('listDate').value+'T00:00:00');const host=$('list');host.replaceChildren();
+  const list=isNaN(d)?[]:classesForDate(d);
+  if(!list.length){host.innerHTML='<div class="empty">この日のクラスはまだありません。<br>日付を選んでクラスを追加してください。</div>';return;}
+  list.forEach(c=>host.append(itemEl(c,c.repeat?'毎週'+DAYS[c.day]:'この日だけ')));
+}
+function dayTextLines(g,text,width){
+ text=String(text).trim();if(text.split('\n').length>6)text=text.replace(/\s+/g,' ');
+ const out=[];String(text).split('\n').forEach(p=>{let line='';for(const ch of p){if(line&&g.measureText(line+ch).width>width){out.push(line);line=ch;}else line+=ch;}out.push(line);});return out;
+}
+
+function getDayPages(){
+  const d=validStoryDate();let list=d?classesForDate(d):[];
+  if($('storyClass').value!=='all')list=list.filter(c=>String(c._i)===$('storyClass').value);
+  const g=$('cv').getContext('2d');const pages=[];let group=[],height=0;
+  list.forEach(c=>{
+    g.font='48px "Hiragino Mincho ProN","Yu Mincho",serif';const names=dayTextLines(g,c.name,888).length;
+    g.font='28px '+FONT;const teachers=c.teacher?dayTextLines(g,'講師 '+c.teacher,888).length:0;
+    const h=24+56+names*62+teachers*38+28;
+    if(group.length&&(group.length===3||height+h>800)){pages.push(group);group=[];height=0;}
+    group.push(c);height+=h;
+  });
+  if(group.length)pages.push(group);return pages.length?pages:[[]];
+}
+
+function drawDayImage(){
+  const cv=$('cv'),g=cv.getContext('2d'),W=cv.width,H=cv.height,d=validStoryDate();
+  g.fillStyle=currentTheme().bg;g.fillRect(0,0,W,H);g.textBaseline='top';g.fillStyle=currentTheme().ink;
+  const serif='"Hiragino Mincho ProN","Yu Mincho",serif';
+  const text=(s,x,y,size=36,font=FONT)=>{g.font=size+'px '+font;g.fillText(s,x,y);};
+  if(!d){text('日付を選んでください',100,720,48);return;}
+  const isToday=iso(d)===iso(new Date()),isTomorrow=iso(d)===iso(tomorrow());
+  const heading=$('storyHeading').value==='date'?'クラス':isTomorrow?'明日のクラス':isToday?'今日のクラス':'クラス';
+  text(heading,96,256,44,serif);
+  text((d.getMonth()+1)+'.'+String(d.getDate()).padStart(2,'0'),88,336,152,'Georgia');
+  text(d.getFullYear()+'年 / '+DAYS[d.getDay()]+'曜日',100,518,32);
+  let list=classesForDate(d);if($('storyClass').value!=='all')list=list.filter(c=>String(c._i)===$('storyClass').value);
+  const page=+$('storyPage').value||0;list=getDayPages()[page]||[];
+  let y=620;
+  g.fillStyle=currentTheme().soft;g.fillRect(96,584,96,6);g.fillStyle=currentTheme().ink;
+  if(!list.length)text('登録されたクラスはありません',96,720,40);
+  list.forEach(c=>{
+    g.strokeStyle=currentTheme().rule;g.lineWidth=2;g.beginPath();g.moveTo(96,y);g.lineTo(984,y);g.stroke();y+=24;
+    g.fillStyle=currentTheme().accent;text(c.start+' – '+c.end,96,y,38);y+=56;
+    g.fillStyle=currentTheme().ink;g.font='48px '+serif;const lines=dayTextLines(g,c.name,888);lines.forEach(line=>{text(line,96,y,48,serif);y+=62;});
+    if(c.teacher){g.fillStyle=currentTheme().sub;g.font='28px '+FONT;dayTextLines(g,'講師 '+c.teacher,888).forEach(line=>{text(line,96,y,28);y+=38;});}y+=28;
+  });
+  g.fillStyle=currentTheme().sub;g.font='32px '+FONT;
+  const note=dayTextLines(g,$('storyNote').value.replace(/\s+/g,' '),888);let footer=Math.max(1450,y+12);
+  note.forEach(line=>{text(line,96,footer,32);footer+=44;});
+  g.font='28px '+FONT;dayTextLines(g,state.title||'ヨガクラス スケジュール',888).forEach(line=>{text(line,96,footer+24,28);footer+=38;});
+  if($('storyPage').options.length>1)text((page+1)+' / '+$('storyPage').options.length,880,550,28);
+}
+
+const THEMES = {
+ beige:{name:'ミルクベージュ',bg:'#faf8f5',ink:'#463930',sub:'#706054',accent:'#85634f',line:'#e5dcd3',rule:'#c8b5a3',soft:'#f0e5d6',stage:'#eee7df',inputLine:'#a49585'},
+ rose:{name:'さくらピンク',bg:'#fff7fa',ink:'#432f40',sub:'#705b6b',accent:'#974e73',line:'#eadce4',rule:'#d8bdcd',soft:'#f1d7e5',stage:'#f3e6ee',inputLine:'#a88c9e'},
+ lavender:{name:'ラベンダー',bg:'#faf8ff',ink:'#40354e',sub:'#6d607a',accent:'#7d5b9b',line:'#e4ddec',rule:'#c8b9d8',soft:'#e9ddf5',stage:'#eee7f4',inputLine:'#9e8caf'},
+ peach:{name:'ピーチ',bg:'#fff8f3',ink:'#50392e',sub:'#795f50',accent:'#a65f49',line:'#eddfd4',rule:'#d9bbaa',soft:'#f8dfd0',stage:'#f6e8de',inputLine:'#ae8f7d'},
+ blue:{name:'パウダーブルー',bg:'#f6faff',ink:'#344252',sub:'#5c6c7d',accent:'#536f96',line:'#dce4ef',rule:'#b8c9dc',soft:'#dde9f6',stage:'#e5edf6',inputLine:'#8b9fb6'}
+};
+function contrastInk(hex){
+ const c=hex.slice(1).match(/../g).map(v=>parseInt(v,16)/255).map(v=>v<=0.04045?v/12.92:((v+0.055)/1.055)**2.4);
+ const l=c[0]*0.2126+c[1]*0.7152+c[2]*0.0722;return (l+0.05)/0.05 >= 1.05/(l+0.05) ? '#000000' : '#ffffff';
+}
+function currentTheme(){
+ if(state.theme!=='custom')return THEMES[state.theme] || THEMES.beige;
+ const c=state.studioColors||{};const bg=safeColor(c.bg,'#faf8f5'),accent=safeColor(c.accent,'#85634f'),soft=safeColor(c.soft,'#f0e5d6');
+ const ink=contrastInk(bg);return {name:'自分で選んだ色',bg,accent,soft,ink,sub:ink,line:soft,rule:accent,stage:soft,inputLine:accent};
+}
+function applyTheme(){
+ const t=currentTheme();
+ const map={bg:'bg',ink:'ink',sub:'sub',accent:'accent',line:'line',rule:'rule',soft:'soft',stage:'stage','input-line':'inputLine'};
+ document.documentElement.style.setProperty('--accent-ink',contrastInk(t.accent));
+ document.documentElement.style.setProperty('--card',t.bg);
+ document.documentElement.style.setProperty('--soft-ink',contrastInk(t.soft));
+ const savedColors=state.studioColors||{};['Bg','Accent','Soft'].forEach(k=>{const el=$('studio'+k);if(el&&savedColors[k.toLowerCase()])el.value=savedColors[k.toLowerCase()];});
+ Object.entries(map).forEach(([key,value])=>document.documentElement.style.setProperty('--'+key,t[value]));
+ if($('themeName'))$('themeName').textContent=t.name;
+ document.querySelectorAll('input[name="studioTheme"]').forEach(r=>r.checked=r.value===(state.theme||'beige'));
+}
+function setupThemePicker(header){
+ const box=document.createElement('details');box.className='theme-picker';box.id='themePicker';
+ box.innerHTML='<summary><span class="theme-dot" aria-hidden="true"></span>画面全体・投稿画像の配色：<span id="themeName">ミルクベージュ</span><span aria-hidden="true"> ▾</span></summary><fieldset class="theme-options"><legend>画面と投稿画像の色を選ぶ</legend></fieldset>';
+ Object.entries(THEMES).forEach(([id,t])=>{const label=document.createElement('label');label.className='theme-choice';const radio=document.createElement('input');radio.type='radio';radio.name='studioTheme';radio.value=id;radio.checked=id==='beige';const swatch=document.createElement('span');swatch.className='theme-sample';swatch.style.background=t.soft;swatch.style.borderColor=t.accent;swatch.setAttribute('aria-hidden','true');label.append(radio,swatch,document.createTextNode(t.name));box.querySelector('fieldset').append(label);radio.addEventListener('change',()=>{if(radio.checked){state.theme=id;save();redraw();}});});
+ const custom=document.createElement('div');custom.className='free-colors';
+ custom.innerHTML='<button type="button" class="ghost" id="useCustomTheme">自分で選んだ色を使う</button><div class="free-color-fields"><label>カレンダー全体の背景<input type="color" id="studioBg" value="#faf8f5"></label><label>ボタン・見出しの色<input type="color" id="studioAccent" value="#85634f"></label><label>曜日見出し・余白の色<input type="color" id="studioSoft" value="#f0e5d6"></label></div><p class="hint">背景や見出しの色は、月間カレンダーと保存画像に反映されます。クラス枠には、それぞれのクラスに登録した色を使います。</p>';
+ box.append(custom);
+ const setCustom=()=>{state.studioColors={bg:$('studioBg').value,accent:$('studioAccent').value,soft:$('studioSoft').value};state.theme='custom';save();redraw();};
+ header.after(box);
+ ['studioBg','studioAccent','studioSoft'].forEach(id=>$(id).oninput=setCustom);
+ $('useCustomTheme').onclick=setCustom;
+
+}
+
+setupWorkspace();
+
 init();
+
+$("listDate").value=$("f-date").value;$("f-color").value="2";renderList();
+const sc=state.studioColors||{};['Bg','Accent','Soft'].forEach(k=>{if(sc[k.toLowerCase()])$('studio'+k).value=sc[k.toLowerCase()];});
 </script>
 </body>
 </html>

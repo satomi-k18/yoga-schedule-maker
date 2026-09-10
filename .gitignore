@@ -3,3 +3,6 @@ ekam-2026-08.json
 yoga-schedule-backup.json
 *.backup.json
 .DS_Store
+
+# ローカルの修正途中バックアップは公開しない
+index.before-*.html

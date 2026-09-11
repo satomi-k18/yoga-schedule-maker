@@ -2,6 +2,10 @@
 
 ヨガ教室向けの月間スケジュールと投稿画像を作る、ブラウザだけで動くツールです。
 
+[公開版を開く](https://yoga-schedule-maker.pages.dev/)
+
+GitHubのmain更新をCloudflare Pagesへ自動公開します。
+
 ## 完成版 2026-09-10
 
 - 登録・編集／月間スケジュール／投稿画像の3タブ。

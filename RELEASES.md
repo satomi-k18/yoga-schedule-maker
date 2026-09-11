@@ -32,3 +32,20 @@ Cloudflareの手動アップロード環境は、該当タグから取り出し�
 同じURL・同じブラウザで切り替えると、両版は同じ保存キーを利用する。
 別URL・別ブラウザへ移るときはJSONバックアップを読み込む。
 旧版で設定を保存すると新しい配色設定は落ちる場合があるため、切り替え前のJSONも保持する。
+
+## Cloudflare公開設定（2026-09-11確認）
+
+- 公開URL: https://yoga-schedule-maker.pages.dev/
+- Cloudflare Pagesプロジェクト: yoga-schedule-maker
+- GitHub連携先: satomi-k18/yoga-schedule-maker
+- 本番ブランチ: main（pushに連動して自動公開）
+- Framework preset: None
+- Build command: `mkdir -p dist && cp index.html _headers dist/`
+- Build output directory: `dist`
+- 公開ファイル: index.html、_headers。予定JSONと作業用バックアップは含めない。
+
+旧版に戻すときは上記のgit restore手順でmainを更新する。Cloudflareが同じ公開URLに自動反映する。
+GitHubの旧版タグと完成版タグは動かさない。旧版をCloudflareに公開した履歴はまだないため、初めて旧版へ戻す場合はGitHubから復元する。
+
+公開URLで月間・投稿画像のタブ切り替え、ストーリー表示を確認済み。
+ローカル版から公開URLに初めて移る際は、アプリのバックアップJSONを保存・読み込みする。
